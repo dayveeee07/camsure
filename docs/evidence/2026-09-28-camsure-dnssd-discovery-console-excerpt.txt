@@ -1,0 +1,13 @@
+User-supplied Windows receiver console excerpt, 2026-09-28.
+The receiver advertised CamSure Receiver DEYB on 192.168.0.146, media UDP 5004,
+and mDNS UDP 5353. Android reported: receiver detected.
+
+The receiver logged this browse/answer pair three times:
+DNS-SD browse query from 192.168.0.233:5353.
+DNS-SD answered 1 record(s) plus 3 additional record(s) to 192.168.0.233:5353.
+
+This is a transcribed excerpt from the console output pasted in the task
+conversation, not a complete raw console log. The excerpt confirms that browse
+queries reached the receiver and the advertiser sent DNS-SD answers. It does
+not record whether the WAN was disconnected, the Android-resolved endpoint, or
+an RTP run using the discovered selection.

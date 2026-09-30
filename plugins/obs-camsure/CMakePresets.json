@@ -1,0 +1,26 @@
+{
+  "version": 8,
+  "configurePresets": [
+    {
+      "name": "windows-x64",
+      "generator": "Visual Studio 17 2022",
+      "architecture": "x64",
+      "binaryDir": "${sourceDir}/build_x64",
+      "cacheVariables": {
+        "ENABLE_FRONTEND_API": false,
+        "ENABLE_QT": false,
+        "CMAKE_COMPILE_WARNING_AS_ERROR": true
+      }
+    },
+    {
+      "name": "windows-vs2026-x64",
+      "inherits": "windows-x64",
+      "generator": "Visual Studio 18 2026",
+      "binaryDir": "${sourceDir}/build_vs2026"
+    }
+  ],
+  "buildPresets": [
+    {"name": "windows-x64", "configurePreset": "windows-x64", "configuration": "RelWithDebInfo"},
+    {"name": "windows-vs2026-x64", "configurePreset": "windows-vs2026-x64", "configuration": "RelWithDebInfo"}
+  ]
+}

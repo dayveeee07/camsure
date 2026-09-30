@@ -1,0 +1,3 @@
+# Agent entry point
+Read docs/AGENTS.md and all eight handrail documents in docs/ before changes.
+These are the authoritative project instructions. Phase 2 capability profiling and Phase 3 device-specific camera/encoder baselines are accepted with limitations. Phase 4 LAN delivery/discovery and Phase 5 transport-neutral decode/native OBS video are implemented; the Samsung ten-minute real-video and recovery baseline is user-confirmed. See docs/PROGRESS.md and docs/TESTING.md for exact evidence and remaining qualification. USB, audio, controls and multicamera implementation remain future slices; do not start them without an explicit user request.

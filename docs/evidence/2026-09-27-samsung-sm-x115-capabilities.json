@@ -1,0 +1,5607 @@
+{
+  "schemaVersion": "1.0.0",
+  "collectionTime": "2026-09-27T05:15:18.338324Z",
+  "device": {
+    "manufacturer": "samsung",
+    "model": "SM-X115",
+    "androidVersion": "16",
+    "apiLevel": 36,
+    "appVersionName": "1.0.0",
+    "appVersionCode": 1
+  },
+  "cameras": {
+    "status": "advertised",
+    "value": [
+      {
+        "cameraId": "0",
+        "metadataQuery": {
+          "status": "advertised",
+          "value": "Camera2 characteristics queried."
+        },
+        "lensFacing": {
+          "status": "advertised",
+          "value": "back"
+        },
+        "hardwareSupportLevel": {
+          "status": "advertised",
+          "value": "level_3"
+        },
+        "logicalCamera": {
+          "status": "unsupported",
+          "value": false,
+          "note": "The camera does not advertise logical multi-camera capability."
+        },
+        "physicalCameras": {
+          "ids": {
+            "status": "unsupported",
+            "value": [],
+            "note": "No physical camera IDs are exposed for this camera."
+          },
+          "metadata": []
+        },
+        "focalLengths": {
+          "status": "advertised",
+          "value": [
+            2.84
+          ],
+          "unit": "millimeters"
+        },
+        "apertures": {
+          "status": "advertised",
+          "value": [
+            2
+          ],
+          "unit": "f_number"
+        },
+        "sensorSize": {
+          "status": "advertised",
+          "value": {
+            "width": 3.65,
+            "height": 2.74
+          },
+          "unit": "millimeters"
+        },
+        "sensorOrientation": {
+          "status": "advertised",
+          "value": 90,
+          "unit": "degrees"
+        },
+        "advertisedCapabilities": {
+          "status": "advertised",
+          "value": [
+            "BACKWARD_COMPATIBLE",
+            "MANUAL_SENSOR",
+            "MANUAL_POST_PROCESSING",
+            "READ_SENSOR_SETTINGS",
+            "RAW",
+            "BURST_CAPTURE",
+            "PRIVATE_REPROCESSING",
+            "YUV_REPROCESSING"
+          ]
+        },
+        "streamFormats": {
+          "status": "advertised",
+          "value": [
+            {
+              "formatCode": 32,
+              "formatName": "RAW_SENSOR",
+              "relevantToVideoCapture": false,
+              "sizes": {
+                "status": "advertised",
+                "value": [
+                  {
+                    "size": {
+                      "width": 3264,
+                      "height": 2448
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  }
+                ],
+                "unit": "pixels"
+              }
+            },
+            {
+              "formatCode": 256,
+              "formatName": "JPEG",
+              "relevantToVideoCapture": false,
+              "sizes": {
+                "status": "advertised",
+                "value": [
+                  {
+                    "size": {
+                      "width": 3264,
+                      "height": 2448
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 3264,
+                      "height": 1952
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 3264,
+                      "height": 1840
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 2560,
+                      "height": 1920
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 2448,
+                      "height": 2448
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1920,
+                      "height": 1440
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1920,
+                      "height": 1152
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1920,
+                      "height": 1088
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1920,
+                      "height": 1080
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 960
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1560,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1520,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 1440
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 1088
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1340,
+                      "height": 800
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1280,
+                      "height": 960
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1280,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1080,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 960,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 720,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 640,
+                      "height": 480
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 640,
+                      "height": 360
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 480,
+                      "height": 320
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 320,
+                      "height": 240
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  }
+                ],
+                "unit": "pixels"
+              }
+            },
+            {
+              "formatCode": 34,
+              "formatName": "PRIVATE",
+              "relevantToVideoCapture": true,
+              "sizes": {
+                "status": "advertised",
+                "value": [
+                  {
+                    "size": {
+                      "width": 3264,
+                      "height": 2448
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 50000000,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 3264,
+                      "height": 1952
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 50000000,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 3264,
+                      "height": 1840
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 50000000,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 2560,
+                      "height": 1920
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 2560,
+                      "height": 1440
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 2448,
+                      "height": 2448
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 50000000,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1920,
+                      "height": 1440
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1920,
+                      "height": 1152
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1920,
+                      "height": 1088
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1920,
+                      "height": 1080
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 960
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1560,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1520,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 1440
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 1088
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 1080
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1340,
+                      "height": 800
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1280,
+                      "height": 960
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1280,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1080,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 960,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 720,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 720,
+                      "height": 480
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 640,
+                      "height": 480
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 640,
+                      "height": 360
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 480,
+                      "height": 320
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 352,
+                      "height": 288
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 320,
+                      "height": 240
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 192,
+                      "height": 144
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 192,
+                      "height": 108
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 176,
+                      "height": 144
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 160,
+                      "height": 96
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  }
+                ],
+                "unit": "pixels"
+              }
+            },
+            {
+              "formatCode": 35,
+              "formatName": "YUV_420_888",
+              "relevantToVideoCapture": true,
+              "sizes": {
+                "status": "advertised",
+                "value": [
+                  {
+                    "size": {
+                      "width": 3264,
+                      "height": 2448
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 50000000,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 3264,
+                      "height": 1952
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 50000000,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 3264,
+                      "height": 1840
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 50000000,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 2560,
+                      "height": 1920
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 2560,
+                      "height": 1440
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 2448,
+                      "height": 2448
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 50000000,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1920,
+                      "height": 1440
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1920,
+                      "height": 1152
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1920,
+                      "height": 1088
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1920,
+                      "height": 1080
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 960
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1560,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1520,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 1440
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 1088
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 1080
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1340,
+                      "height": 800
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1280,
+                      "height": 960
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1280,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1080,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 960,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 720,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 720,
+                      "height": 480
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 640,
+                      "height": 480
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 640,
+                      "height": 360
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 480,
+                      "height": 320
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 352,
+                      "height": 288
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 320,
+                      "height": 240
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 192,
+                      "height": 144
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 192,
+                      "height": 108
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 176,
+                      "height": 144
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 160,
+                      "height": 96
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  }
+                ],
+                "unit": "pixels"
+              }
+            },
+            {
+              "formatCode": 842094169,
+              "formatName": "YV12",
+              "relevantToVideoCapture": false,
+              "sizes": {
+                "status": "advertised",
+                "value": [
+                  {
+                    "size": {
+                      "width": 3264,
+                      "height": 2448
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 50000000,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 3264,
+                      "height": 1952
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 50000000,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 3264,
+                      "height": 1840
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 50000000,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 2560,
+                      "height": 1920
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 2560,
+                      "height": 1440
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 2448,
+                      "height": 2448
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 50000000,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1920,
+                      "height": 1440
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1920,
+                      "height": 1152
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1920,
+                      "height": 1088
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1920,
+                      "height": 1080
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 960
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1560,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1520,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 1440
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 1088
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 1080
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1340,
+                      "height": 800
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1280,
+                      "height": 960
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1280,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1080,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 960,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 720,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 720,
+                      "height": 480
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 640,
+                      "height": 480
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 640,
+                      "height": 360
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 480,
+                      "height": 320
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 352,
+                      "height": 288
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 320,
+                      "height": 240
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 192,
+                      "height": 144
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 192,
+                      "height": 108
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 176,
+                      "height": 144
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 160,
+                      "height": 96
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  }
+                ],
+                "unit": "pixels"
+              }
+            }
+          ]
+        },
+        "aeTargetFpsRanges": {
+          "status": "advertised",
+          "value": [
+            {
+              "lower": 10,
+              "upper": 10
+            },
+            {
+              "lower": 15,
+              "upper": 15
+            },
+            {
+              "lower": 15,
+              "upper": 20
+            },
+            {
+              "lower": 20,
+              "upper": 20
+            },
+            {
+              "lower": 5,
+              "upper": 30
+            },
+            {
+              "lower": 30,
+              "upper": 30
+            }
+          ],
+          "unit": "frames_per_second"
+        },
+        "constrainedHighSpeedModes": {
+          "status": "unsupported",
+          "value": [],
+          "note": "The camera did not advertise values for this metadata field."
+        },
+        "dynamicRangeProfiles": {
+          "status": "unsupported",
+          "value": null,
+          "note": "The camera did not expose this metadata field. Profile metadata only; stream\/session compatibility was not queried."
+        },
+        "controls": {
+          "autofocusModes": {
+            "status": "advertised",
+            "value": [
+              "off",
+              "auto",
+              "macro",
+              "continuous_video",
+              "continuous_picture"
+            ]
+          },
+          "minimumFocusDistance": {
+            "status": "advertised",
+            "value": 20,
+            "unit": "diopters"
+          },
+          "exposureCompensationSteps": {
+            "status": "advertised",
+            "value": {
+              "lower": -20,
+              "upper": 20
+            },
+            "unit": "steps"
+          },
+          "exposureCompensationStep": {
+            "status": "advertised",
+            "value": {
+              "numerator": 1,
+              "denominator": 10,
+              "decimal": 0.10000000149011612
+            },
+            "unit": "EV per step"
+          },
+          "aeLockAvailable": {
+            "status": "advertised",
+            "value": true
+          },
+          "aeModes": {
+            "status": "advertised",
+            "value": [
+              "off",
+              "on"
+            ]
+          },
+          "awbLockAvailable": {
+            "status": "advertised",
+            "value": true
+          },
+          "awbModes": {
+            "status": "advertised",
+            "value": [
+              "off",
+              "auto",
+              "incandescent",
+              "fluorescent",
+              "warm_fluorescent",
+              "daylight",
+              "cloudy_daylight",
+              "twilight",
+              "shade"
+            ]
+          },
+          "manualSensorCapability": {
+            "status": "advertised",
+            "value": true,
+            "note": "Derived from REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR."
+          },
+          "isoSensitivityRange": {
+            "status": "advertised",
+            "value": {
+              "lower": 100,
+              "upper": 1600
+            },
+            "unit": "ISO"
+          },
+          "exposureTimeRange": {
+            "status": "advertised",
+            "value": {
+              "lower": 100000,
+              "upper": 400000000
+            },
+            "unit": "nanoseconds"
+          },
+          "zoom": {
+            "camera2RatioRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 1,
+                "upper": 10
+              },
+              "unit": "ratio"
+            },
+            "maximumDigitalZoom": {
+              "status": "advertised",
+              "value": 10,
+              "unit": "ratio"
+            },
+            "effectiveRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 1,
+                "upper": 10
+              },
+              "unit": "ratio"
+            },
+            "effectiveRangeSource": "camera2_zoom_ratio"
+          },
+          "flashUnitAvailable": {
+            "status": "advertised",
+            "value": false
+          },
+          "torchAvailable": {
+            "status": "unsupported",
+            "value": false,
+            "note": "Derived from FLASH_INFO_AVAILABLE; torch was not activated."
+          },
+          "opticalStabilizationModes": {
+            "status": "advertised",
+            "value": [
+              "off"
+            ]
+          },
+          "videoStabilizationModes": {
+            "status": "advertised",
+            "value": [
+              "off"
+            ]
+          }
+        },
+        "runtimeCaptureTest": {
+          "status": "not_runtime_tested",
+          "value": null,
+          "note": "No capture session was started."
+        },
+        "collectionIssues": []
+      },
+      {
+        "cameraId": "1",
+        "metadataQuery": {
+          "status": "advertised",
+          "value": "Camera2 characteristics queried."
+        },
+        "lensFacing": {
+          "status": "advertised",
+          "value": "front"
+        },
+        "hardwareSupportLevel": {
+          "status": "advertised",
+          "value": "level_3"
+        },
+        "logicalCamera": {
+          "status": "unsupported",
+          "value": false,
+          "note": "The camera does not advertise logical multi-camera capability."
+        },
+        "physicalCameras": {
+          "ids": {
+            "status": "unsupported",
+            "value": [],
+            "note": "No physical camera IDs are exposed for this camera."
+          },
+          "metadata": []
+        },
+        "focalLengths": {
+          "status": "advertised",
+          "value": [
+            2.216
+          ],
+          "unit": "millimeters"
+        },
+        "apertures": {
+          "status": "advertised",
+          "value": [
+            2.2
+          ],
+          "unit": "f_number"
+        },
+        "sensorSize": {
+          "status": "advertised",
+          "value": {
+            "width": 2.8,
+            "height": 2.1
+          },
+          "unit": "millimeters"
+        },
+        "sensorOrientation": {
+          "status": "advertised",
+          "value": 270,
+          "unit": "degrees"
+        },
+        "advertisedCapabilities": {
+          "status": "advertised",
+          "value": [
+            "BACKWARD_COMPATIBLE",
+            "MANUAL_SENSOR",
+            "MANUAL_POST_PROCESSING",
+            "READ_SENSOR_SETTINGS",
+            "RAW",
+            "BURST_CAPTURE",
+            "PRIVATE_REPROCESSING",
+            "YUV_REPROCESSING"
+          ]
+        },
+        "streamFormats": {
+          "status": "advertised",
+          "value": [
+            {
+              "formatCode": 32,
+              "formatName": "RAW_SENSOR",
+              "relevantToVideoCapture": false,
+              "sizes": {
+                "status": "advertised",
+                "value": [
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 1200
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  }
+                ],
+                "unit": "pixels"
+              }
+            },
+            {
+              "formatCode": 256,
+              "formatName": "JPEG",
+              "relevantToVideoCapture": false,
+              "sizes": {
+                "status": "advertised",
+                "value": [
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 1200
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 960
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 900
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1560,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1520,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 1088
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1340,
+                      "height": 800
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1280,
+                      "height": 960
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1280,
+                      "height": 760
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1280,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1200,
+                      "height": 1200
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1080,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 960,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 720,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 640,
+                      "height": 480
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 640,
+                      "height": 360
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 480,
+                      "height": 320
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 320,
+                      "height": 240
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    }
+                  }
+                ],
+                "unit": "pixels"
+              }
+            },
+            {
+              "formatCode": 34,
+              "formatName": "PRIVATE",
+              "relevantToVideoCapture": true,
+              "sizes": {
+                "status": "advertised",
+                "value": [
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 1200
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 50000000,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 960
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 900
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 50000000,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1560,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1520,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 1088
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 1080
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1340,
+                      "height": 800
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 50000000,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1280,
+                      "height": 960
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1280,
+                      "height": 760
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1280,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1200,
+                      "height": 1200
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1080,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 960,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 720,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 720,
+                      "height": 480
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 640,
+                      "height": 480
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 640,
+                      "height": 360
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 480,
+                      "height": 320
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 352,
+                      "height": 288
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 320,
+                      "height": 240
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 192,
+                      "height": 144
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 192,
+                      "height": 108
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 176,
+                      "height": 144
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 160,
+                      "height": 96
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  }
+                ],
+                "unit": "pixels"
+              }
+            },
+            {
+              "formatCode": 35,
+              "formatName": "YUV_420_888",
+              "relevantToVideoCapture": true,
+              "sizes": {
+                "status": "advertised",
+                "value": [
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 1200
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 50000000,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 960
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 900
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 50000000,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1560,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1520,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 1088
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 1080
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1340,
+                      "height": 800
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 50000000,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1280,
+                      "height": 960
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1280,
+                      "height": 760
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1280,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1200,
+                      "height": 1200
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1080,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 960,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 720,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 720,
+                      "height": 480
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 640,
+                      "height": 480
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 640,
+                      "height": 360
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 480,
+                      "height": 320
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 352,
+                      "height": 288
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 320,
+                      "height": 240
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 192,
+                      "height": 144
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 192,
+                      "height": 108
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 176,
+                      "height": 144
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 160,
+                      "height": 96
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  }
+                ],
+                "unit": "pixels"
+              }
+            },
+            {
+              "formatCode": 842094169,
+              "formatName": "YV12",
+              "relevantToVideoCapture": false,
+              "sizes": {
+                "status": "advertised",
+                "value": [
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 1200
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 50000000,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 960
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 900
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 50000000,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1600,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1560,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1520,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 1088
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 1080
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1440,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1340,
+                      "height": 800
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 50000000,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1280,
+                      "height": 960
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1280,
+                      "height": 760
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1280,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1200,
+                      "height": 1200
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 1080,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 960,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 720,
+                      "height": 720
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 720,
+                      "height": 480
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 640,
+                      "height": 480
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 640,
+                      "height": 360
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 480,
+                      "height": 320
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 352,
+                      "height": 288
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 320,
+                      "height": 240
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 192,
+                      "height": 144
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 192,
+                      "height": 108
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 176,
+                      "height": 144
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  },
+                  {
+                    "size": {
+                      "width": 160,
+                      "height": 96
+                    },
+                    "minimumFrameDuration": {
+                      "status": "advertised",
+                      "value": 33333333,
+                      "unit": "nanoseconds"
+                    },
+                    "stallDuration": {
+                      "status": "advertised",
+                      "value": 0,
+                      "unit": "nanoseconds"
+                    }
+                  }
+                ],
+                "unit": "pixels"
+              }
+            }
+          ]
+        },
+        "aeTargetFpsRanges": {
+          "status": "advertised",
+          "value": [
+            {
+              "lower": 10,
+              "upper": 10
+            },
+            {
+              "lower": 15,
+              "upper": 15
+            },
+            {
+              "lower": 15,
+              "upper": 20
+            },
+            {
+              "lower": 20,
+              "upper": 20
+            },
+            {
+              "lower": 10,
+              "upper": 30
+            },
+            {
+              "lower": 30,
+              "upper": 30
+            }
+          ],
+          "unit": "frames_per_second"
+        },
+        "constrainedHighSpeedModes": {
+          "status": "unsupported",
+          "value": [],
+          "note": "The camera did not advertise values for this metadata field."
+        },
+        "dynamicRangeProfiles": {
+          "status": "unsupported",
+          "value": null,
+          "note": "The camera did not expose this metadata field. Profile metadata only; stream\/session compatibility was not queried."
+        },
+        "controls": {
+          "autofocusModes": {
+            "status": "advertised",
+            "value": [
+              "off"
+            ]
+          },
+          "minimumFocusDistance": {
+            "status": "advertised",
+            "value": 0,
+            "unit": "diopters"
+          },
+          "exposureCompensationSteps": {
+            "status": "advertised",
+            "value": {
+              "lower": -20,
+              "upper": 20
+            },
+            "unit": "steps"
+          },
+          "exposureCompensationStep": {
+            "status": "advertised",
+            "value": {
+              "numerator": 1,
+              "denominator": 10,
+              "decimal": 0.10000000149011612
+            },
+            "unit": "EV per step"
+          },
+          "aeLockAvailable": {
+            "status": "advertised",
+            "value": true
+          },
+          "aeModes": {
+            "status": "advertised",
+            "value": [
+              "off",
+              "on",
+              "on_external_flash"
+            ]
+          },
+          "awbLockAvailable": {
+            "status": "advertised",
+            "value": true
+          },
+          "awbModes": {
+            "status": "advertised",
+            "value": [
+              "off",
+              "auto",
+              "incandescent",
+              "fluorescent",
+              "warm_fluorescent",
+              "daylight",
+              "cloudy_daylight",
+              "twilight",
+              "shade"
+            ]
+          },
+          "manualSensorCapability": {
+            "status": "advertised",
+            "value": true,
+            "note": "Derived from REQUEST_AVAILABLE_CAPABILITIES_MANUAL_SENSOR."
+          },
+          "isoSensitivityRange": {
+            "status": "advertised",
+            "value": {
+              "lower": 100,
+              "upper": 800
+            },
+            "unit": "ISO"
+          },
+          "exposureTimeRange": {
+            "status": "advertised",
+            "value": {
+              "lower": 100000,
+              "upper": 400000000
+            },
+            "unit": "nanoseconds"
+          },
+          "zoom": {
+            "camera2RatioRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 1,
+                "upper": 10
+              },
+              "unit": "ratio"
+            },
+            "maximumDigitalZoom": {
+              "status": "advertised",
+              "value": 10,
+              "unit": "ratio"
+            },
+            "effectiveRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 1,
+                "upper": 10
+              },
+              "unit": "ratio"
+            },
+            "effectiveRangeSource": "camera2_zoom_ratio"
+          },
+          "flashUnitAvailable": {
+            "status": "advertised",
+            "value": false
+          },
+          "torchAvailable": {
+            "status": "unsupported",
+            "value": false,
+            "note": "Derived from FLASH_INFO_AVAILABLE; torch was not activated."
+          },
+          "opticalStabilizationModes": {
+            "status": "advertised",
+            "value": [
+              "off"
+            ]
+          },
+          "videoStabilizationModes": {
+            "status": "advertised",
+            "value": [
+              "off"
+            ]
+          }
+        },
+        "runtimeCaptureTest": {
+          "status": "not_runtime_tested",
+          "value": null,
+          "note": "No capture session was started."
+        },
+        "collectionIssues": []
+      }
+    ]
+  },
+  "videoEncoders": {
+    "status": "advertised",
+    "value": [
+      {
+        "codecName": "c2.mtk.avc.encoder",
+        "mimeType": "video\/avc",
+        "hardwareAccelerated": {
+          "status": "advertised",
+          "value": true
+        },
+        "softwareOnly": {
+          "status": "advertised",
+          "value": false
+        },
+        "vendorCodec": {
+          "status": "advertised",
+          "value": true
+        },
+        "alias": {
+          "status": "advertised",
+          "value": false
+        },
+        "profileLevels": {
+          "status": "advertised",
+          "value": [
+            {
+              "profile": 1,
+              "profileName": "Baseline",
+              "level": 16384,
+              "levelName": "AVCLevel5"
+            },
+            {
+              "profile": 2,
+              "profileName": "Main",
+              "level": 16384,
+              "levelName": "AVCLevel5"
+            },
+            {
+              "profile": 8,
+              "profileName": "High",
+              "level": 16384,
+              "levelName": "AVCLevel5"
+            }
+          ]
+        },
+        "videoConstraints": {
+          "status": "advertised",
+          "value": {
+            "widthRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 128,
+                "upper": 2560
+              },
+              "unit": "pixels"
+            },
+            "heightRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 128,
+                "upper": 2560
+              },
+              "unit": "pixels"
+            },
+            "widthAlignment": {
+              "status": "advertised",
+              "value": 2,
+              "unit": "pixels"
+            },
+            "heightAlignment": {
+              "status": "advertised",
+              "value": 2,
+              "unit": "pixels"
+            },
+            "bitrateRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 1,
+                "upper": 100000000
+              },
+              "unit": "bits_per_second"
+            },
+            "frameRateRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 0,
+                "upper": 960
+              },
+              "unit": "frames_per_second"
+            },
+            "bitrateModes": {
+              "status": "advertised",
+              "value": [
+                {
+                  "mode": 2,
+                  "name": "cbr",
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  }
+                },
+                {
+                  "mode": 1,
+                  "name": "vbr",
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  }
+                },
+                {
+                  "mode": 0,
+                  "name": "constant_quality",
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  }
+                }
+              ]
+            },
+            "representativeModeChecks": {
+              "status": "advertised",
+              "value": [
+                {
+                  "size": {
+                    "width": 1280,
+                    "height": 720
+                  },
+                  "frameRate": 30,
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  },
+                  "supportedFrameRateRange": {
+                    "status": "advertised",
+                    "value": {
+                      "lower": 0.027777777777777776,
+                      "upper": 120
+                    },
+                    "unit": "frames_per_second"
+                  }
+                },
+                {
+                  "size": {
+                    "width": 1920,
+                    "height": 1080
+                  },
+                  "frameRate": 30,
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  },
+                  "supportedFrameRateRange": {
+                    "status": "advertised",
+                    "value": {
+                      "lower": 0.012254901960784314,
+                      "upper": 52.94117647058823
+                    },
+                    "unit": "frames_per_second"
+                  }
+                },
+                {
+                  "size": {
+                    "width": 1920,
+                    "height": 1080
+                  },
+                  "frameRate": 60,
+                  "supported": {
+                    "status": "unsupported",
+                    "value": false,
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  },
+                  "supportedFrameRateRange": {
+                    "status": "unsupported",
+                    "value": null,
+                    "unit": "frames_per_second",
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  }
+                }
+              ],
+              "note": "Point queries only for 720p30, 1080p30, and 1080p60; this is not an exhaustive size\/FPS matrix or runtime test."
+            },
+            "interpretation": "Range and alignment are codec constraints, not an exhaustive list of valid size\/FPS combinations."
+          }
+        },
+        "runtimeEncodeTest": {
+          "status": "not_runtime_tested",
+          "value": null,
+          "note": "No MediaCodec encoder was created or run."
+        },
+        "collectionIssues": []
+      },
+      {
+        "codecName": "OMX.MTK.VIDEO.ENCODER.AVC",
+        "mimeType": "video\/avc",
+        "hardwareAccelerated": {
+          "status": "advertised",
+          "value": true
+        },
+        "softwareOnly": {
+          "status": "advertised",
+          "value": false
+        },
+        "vendorCodec": {
+          "status": "advertised",
+          "value": true
+        },
+        "alias": {
+          "status": "advertised",
+          "value": true
+        },
+        "profileLevels": {
+          "status": "advertised",
+          "value": [
+            {
+              "profile": 1,
+              "profileName": "Baseline",
+              "level": 16384,
+              "levelName": "AVCLevel5"
+            },
+            {
+              "profile": 2,
+              "profileName": "Main",
+              "level": 16384,
+              "levelName": "AVCLevel5"
+            },
+            {
+              "profile": 8,
+              "profileName": "High",
+              "level": 16384,
+              "levelName": "AVCLevel5"
+            }
+          ]
+        },
+        "videoConstraints": {
+          "status": "advertised",
+          "value": {
+            "widthRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 128,
+                "upper": 2560
+              },
+              "unit": "pixels"
+            },
+            "heightRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 128,
+                "upper": 2560
+              },
+              "unit": "pixels"
+            },
+            "widthAlignment": {
+              "status": "advertised",
+              "value": 2,
+              "unit": "pixels"
+            },
+            "heightAlignment": {
+              "status": "advertised",
+              "value": 2,
+              "unit": "pixels"
+            },
+            "bitrateRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 1,
+                "upper": 100000000
+              },
+              "unit": "bits_per_second"
+            },
+            "frameRateRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 0,
+                "upper": 960
+              },
+              "unit": "frames_per_second"
+            },
+            "bitrateModes": {
+              "status": "advertised",
+              "value": [
+                {
+                  "mode": 2,
+                  "name": "cbr",
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  }
+                },
+                {
+                  "mode": 1,
+                  "name": "vbr",
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  }
+                },
+                {
+                  "mode": 0,
+                  "name": "constant_quality",
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  }
+                }
+              ]
+            },
+            "representativeModeChecks": {
+              "status": "advertised",
+              "value": [
+                {
+                  "size": {
+                    "width": 1280,
+                    "height": 720
+                  },
+                  "frameRate": 30,
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  },
+                  "supportedFrameRateRange": {
+                    "status": "advertised",
+                    "value": {
+                      "lower": 0.027777777777777776,
+                      "upper": 120
+                    },
+                    "unit": "frames_per_second"
+                  }
+                },
+                {
+                  "size": {
+                    "width": 1920,
+                    "height": 1080
+                  },
+                  "frameRate": 30,
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  },
+                  "supportedFrameRateRange": {
+                    "status": "advertised",
+                    "value": {
+                      "lower": 0.012254901960784314,
+                      "upper": 52.94117647058823
+                    },
+                    "unit": "frames_per_second"
+                  }
+                },
+                {
+                  "size": {
+                    "width": 1920,
+                    "height": 1080
+                  },
+                  "frameRate": 60,
+                  "supported": {
+                    "status": "unsupported",
+                    "value": false,
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  },
+                  "supportedFrameRateRange": {
+                    "status": "unsupported",
+                    "value": null,
+                    "unit": "frames_per_second",
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  }
+                }
+              ],
+              "note": "Point queries only for 720p30, 1080p30, and 1080p60; this is not an exhaustive size\/FPS matrix or runtime test."
+            },
+            "interpretation": "Range and alignment are codec constraints, not an exhaustive list of valid size\/FPS combinations."
+          }
+        },
+        "runtimeEncodeTest": {
+          "status": "not_runtime_tested",
+          "value": null,
+          "note": "No MediaCodec encoder was created or run."
+        },
+        "collectionIssues": []
+      },
+      {
+        "codecName": "c2.mtk.hevc.encoder",
+        "mimeType": "video\/hevc",
+        "hardwareAccelerated": {
+          "status": "advertised",
+          "value": true
+        },
+        "softwareOnly": {
+          "status": "advertised",
+          "value": false
+        },
+        "vendorCodec": {
+          "status": "advertised",
+          "value": true
+        },
+        "alias": {
+          "status": "advertised",
+          "value": false
+        },
+        "profileLevels": {
+          "status": "advertised",
+          "value": [
+            {
+              "profile": 1,
+              "profileName": "Main",
+              "level": 32768,
+              "levelName": "5"
+            }
+          ]
+        },
+        "videoConstraints": {
+          "status": "advertised",
+          "value": {
+            "widthRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 128,
+                "upper": 2560
+              },
+              "unit": "pixels"
+            },
+            "heightRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 128,
+                "upper": 2560
+              },
+              "unit": "pixels"
+            },
+            "widthAlignment": {
+              "status": "advertised",
+              "value": 2,
+              "unit": "pixels"
+            },
+            "heightAlignment": {
+              "status": "advertised",
+              "value": 2,
+              "unit": "pixels"
+            },
+            "bitrateRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 1,
+                "upper": 100000000
+              },
+              "unit": "bits_per_second"
+            },
+            "frameRateRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 0,
+                "upper": 960
+              },
+              "unit": "frames_per_second"
+            },
+            "bitrateModes": {
+              "status": "advertised",
+              "value": [
+                {
+                  "mode": 2,
+                  "name": "cbr",
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  }
+                },
+                {
+                  "mode": 1,
+                  "name": "vbr",
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  }
+                },
+                {
+                  "mode": 0,
+                  "name": "constant_quality",
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  }
+                }
+              ]
+            },
+            "representativeModeChecks": {
+              "status": "advertised",
+              "value": [
+                {
+                  "size": {
+                    "width": 1280,
+                    "height": 720
+                  },
+                  "frameRate": 30,
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  },
+                  "supportedFrameRateRange": {
+                    "status": "advertised",
+                    "value": {
+                      "lower": 0.027777777777777776,
+                      "upper": 120
+                    },
+                    "unit": "frames_per_second"
+                  }
+                },
+                {
+                  "size": {
+                    "width": 1920,
+                    "height": 1080
+                  },
+                  "frameRate": 30,
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  },
+                  "supportedFrameRateRange": {
+                    "status": "advertised",
+                    "value": {
+                      "lower": 0.012254901960784314,
+                      "upper": 52.94117647058823
+                    },
+                    "unit": "frames_per_second"
+                  }
+                },
+                {
+                  "size": {
+                    "width": 1920,
+                    "height": 1080
+                  },
+                  "frameRate": 60,
+                  "supported": {
+                    "status": "unsupported",
+                    "value": false,
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  },
+                  "supportedFrameRateRange": {
+                    "status": "unsupported",
+                    "value": null,
+                    "unit": "frames_per_second",
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  }
+                }
+              ],
+              "note": "Point queries only for 720p30, 1080p30, and 1080p60; this is not an exhaustive size\/FPS matrix or runtime test."
+            },
+            "interpretation": "Range and alignment are codec constraints, not an exhaustive list of valid size\/FPS combinations."
+          }
+        },
+        "runtimeEncodeTest": {
+          "status": "not_runtime_tested",
+          "value": null,
+          "note": "No MediaCodec encoder was created or run."
+        },
+        "collectionIssues": []
+      },
+      {
+        "codecName": "OMX.MTK.VIDEO.ENCODER.HEVC",
+        "mimeType": "video\/hevc",
+        "hardwareAccelerated": {
+          "status": "advertised",
+          "value": true
+        },
+        "softwareOnly": {
+          "status": "advertised",
+          "value": false
+        },
+        "vendorCodec": {
+          "status": "advertised",
+          "value": true
+        },
+        "alias": {
+          "status": "advertised",
+          "value": true
+        },
+        "profileLevels": {
+          "status": "advertised",
+          "value": [
+            {
+              "profile": 1,
+              "profileName": "Main",
+              "level": 32768,
+              "levelName": "5"
+            }
+          ]
+        },
+        "videoConstraints": {
+          "status": "advertised",
+          "value": {
+            "widthRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 128,
+                "upper": 2560
+              },
+              "unit": "pixels"
+            },
+            "heightRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 128,
+                "upper": 2560
+              },
+              "unit": "pixels"
+            },
+            "widthAlignment": {
+              "status": "advertised",
+              "value": 2,
+              "unit": "pixels"
+            },
+            "heightAlignment": {
+              "status": "advertised",
+              "value": 2,
+              "unit": "pixels"
+            },
+            "bitrateRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 1,
+                "upper": 100000000
+              },
+              "unit": "bits_per_second"
+            },
+            "frameRateRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 0,
+                "upper": 960
+              },
+              "unit": "frames_per_second"
+            },
+            "bitrateModes": {
+              "status": "advertised",
+              "value": [
+                {
+                  "mode": 2,
+                  "name": "cbr",
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  }
+                },
+                {
+                  "mode": 1,
+                  "name": "vbr",
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  }
+                },
+                {
+                  "mode": 0,
+                  "name": "constant_quality",
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  }
+                }
+              ]
+            },
+            "representativeModeChecks": {
+              "status": "advertised",
+              "value": [
+                {
+                  "size": {
+                    "width": 1280,
+                    "height": 720
+                  },
+                  "frameRate": 30,
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  },
+                  "supportedFrameRateRange": {
+                    "status": "advertised",
+                    "value": {
+                      "lower": 0.027777777777777776,
+                      "upper": 120
+                    },
+                    "unit": "frames_per_second"
+                  }
+                },
+                {
+                  "size": {
+                    "width": 1920,
+                    "height": 1080
+                  },
+                  "frameRate": 30,
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  },
+                  "supportedFrameRateRange": {
+                    "status": "advertised",
+                    "value": {
+                      "lower": 0.012254901960784314,
+                      "upper": 52.94117647058823
+                    },
+                    "unit": "frames_per_second"
+                  }
+                },
+                {
+                  "size": {
+                    "width": 1920,
+                    "height": 1080
+                  },
+                  "frameRate": 60,
+                  "supported": {
+                    "status": "unsupported",
+                    "value": false,
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  },
+                  "supportedFrameRateRange": {
+                    "status": "unsupported",
+                    "value": null,
+                    "unit": "frames_per_second",
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  }
+                }
+              ],
+              "note": "Point queries only for 720p30, 1080p30, and 1080p60; this is not an exhaustive size\/FPS matrix or runtime test."
+            },
+            "interpretation": "Range and alignment are codec constraints, not an exhaustive list of valid size\/FPS combinations."
+          }
+        },
+        "runtimeEncodeTest": {
+          "status": "not_runtime_tested",
+          "value": null,
+          "note": "No MediaCodec encoder was created or run."
+        },
+        "collectionIssues": []
+      },
+      {
+        "codecName": "c2.android.avc.encoder",
+        "mimeType": "video\/avc",
+        "hardwareAccelerated": {
+          "status": "advertised",
+          "value": false
+        },
+        "softwareOnly": {
+          "status": "advertised",
+          "value": true
+        },
+        "vendorCodec": {
+          "status": "advertised",
+          "value": false
+        },
+        "alias": {
+          "status": "advertised",
+          "value": false
+        },
+        "profileLevels": {
+          "status": "advertised",
+          "value": [
+            {
+              "profile": 1,
+              "profileName": "Baseline",
+              "level": 16384,
+              "levelName": "AVCLevel5"
+            },
+            {
+              "profile": 65536,
+              "profileName": "ConstrainedBaseline",
+              "level": 16384,
+              "levelName": "AVCLevel5"
+            },
+            {
+              "profile": 2,
+              "profileName": "Main",
+              "level": 16384,
+              "levelName": "AVCLevel5"
+            }
+          ]
+        },
+        "videoConstraints": {
+          "status": "advertised",
+          "value": {
+            "widthRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 16,
+                "upper": 1808
+              },
+              "unit": "pixels"
+            },
+            "heightRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 16,
+                "upper": 1808
+              },
+              "unit": "pixels"
+            },
+            "widthAlignment": {
+              "status": "advertised",
+              "value": 2,
+              "unit": "pixels"
+            },
+            "heightAlignment": {
+              "status": "advertised",
+              "value": 2,
+              "unit": "pixels"
+            },
+            "bitrateRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 1,
+                "upper": 12000000
+              },
+              "unit": "bits_per_second"
+            },
+            "frameRateRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 0,
+                "upper": 960
+              },
+              "unit": "frames_per_second"
+            },
+            "bitrateModes": {
+              "status": "advertised",
+              "value": [
+                {
+                  "mode": 2,
+                  "name": "cbr",
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  }
+                },
+                {
+                  "mode": 1,
+                  "name": "vbr",
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  }
+                },
+                {
+                  "mode": 0,
+                  "name": "constant_quality",
+                  "supported": {
+                    "status": "advertised",
+                    "value": false
+                  }
+                }
+              ]
+            },
+            "representativeModeChecks": {
+              "status": "advertised",
+              "value": [
+                {
+                  "size": {
+                    "width": 1280,
+                    "height": 720
+                  },
+                  "frameRate": 30,
+                  "supported": {
+                    "status": "unsupported",
+                    "value": false,
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  },
+                  "supportedFrameRateRange": {
+                    "status": "unsupported",
+                    "value": null,
+                    "unit": "frames_per_second",
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  }
+                },
+                {
+                  "size": {
+                    "width": 1920,
+                    "height": 1080
+                  },
+                  "frameRate": 30,
+                  "supported": {
+                    "status": "unsupported",
+                    "value": false,
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  },
+                  "supportedFrameRateRange": {
+                    "status": "unsupported",
+                    "value": null,
+                    "unit": "frames_per_second",
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  }
+                },
+                {
+                  "size": {
+                    "width": 1920,
+                    "height": 1080
+                  },
+                  "frameRate": 60,
+                  "supported": {
+                    "status": "unsupported",
+                    "value": false,
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  },
+                  "supportedFrameRateRange": {
+                    "status": "unsupported",
+                    "value": null,
+                    "unit": "frames_per_second",
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  }
+                }
+              ],
+              "note": "Point queries only for 720p30, 1080p30, and 1080p60; this is not an exhaustive size\/FPS matrix or runtime test."
+            },
+            "interpretation": "Range and alignment are codec constraints, not an exhaustive list of valid size\/FPS combinations."
+          }
+        },
+        "runtimeEncodeTest": {
+          "status": "not_runtime_tested",
+          "value": null,
+          "note": "No MediaCodec encoder was created or run."
+        },
+        "collectionIssues": []
+      },
+      {
+        "codecName": "OMX.google.h264.encoder",
+        "mimeType": "video\/avc",
+        "hardwareAccelerated": {
+          "status": "advertised",
+          "value": false
+        },
+        "softwareOnly": {
+          "status": "advertised",
+          "value": true
+        },
+        "vendorCodec": {
+          "status": "advertised",
+          "value": false
+        },
+        "alias": {
+          "status": "advertised",
+          "value": true
+        },
+        "profileLevels": {
+          "status": "advertised",
+          "value": [
+            {
+              "profile": 1,
+              "profileName": "Baseline",
+              "level": 16384,
+              "levelName": "AVCLevel5"
+            },
+            {
+              "profile": 65536,
+              "profileName": "ConstrainedBaseline",
+              "level": 16384,
+              "levelName": "AVCLevel5"
+            },
+            {
+              "profile": 2,
+              "profileName": "Main",
+              "level": 16384,
+              "levelName": "AVCLevel5"
+            }
+          ]
+        },
+        "videoConstraints": {
+          "status": "advertised",
+          "value": {
+            "widthRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 16,
+                "upper": 1808
+              },
+              "unit": "pixels"
+            },
+            "heightRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 16,
+                "upper": 1808
+              },
+              "unit": "pixels"
+            },
+            "widthAlignment": {
+              "status": "advertised",
+              "value": 2,
+              "unit": "pixels"
+            },
+            "heightAlignment": {
+              "status": "advertised",
+              "value": 2,
+              "unit": "pixels"
+            },
+            "bitrateRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 1,
+                "upper": 12000000
+              },
+              "unit": "bits_per_second"
+            },
+            "frameRateRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 0,
+                "upper": 960
+              },
+              "unit": "frames_per_second"
+            },
+            "bitrateModes": {
+              "status": "advertised",
+              "value": [
+                {
+                  "mode": 2,
+                  "name": "cbr",
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  }
+                },
+                {
+                  "mode": 1,
+                  "name": "vbr",
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  }
+                },
+                {
+                  "mode": 0,
+                  "name": "constant_quality",
+                  "supported": {
+                    "status": "advertised",
+                    "value": false
+                  }
+                }
+              ]
+            },
+            "representativeModeChecks": {
+              "status": "advertised",
+              "value": [
+                {
+                  "size": {
+                    "width": 1280,
+                    "height": 720
+                  },
+                  "frameRate": 30,
+                  "supported": {
+                    "status": "unsupported",
+                    "value": false,
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  },
+                  "supportedFrameRateRange": {
+                    "status": "unsupported",
+                    "value": null,
+                    "unit": "frames_per_second",
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  }
+                },
+                {
+                  "size": {
+                    "width": 1920,
+                    "height": 1080
+                  },
+                  "frameRate": 30,
+                  "supported": {
+                    "status": "unsupported",
+                    "value": false,
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  },
+                  "supportedFrameRateRange": {
+                    "status": "unsupported",
+                    "value": null,
+                    "unit": "frames_per_second",
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  }
+                },
+                {
+                  "size": {
+                    "width": 1920,
+                    "height": 1080
+                  },
+                  "frameRate": 60,
+                  "supported": {
+                    "status": "unsupported",
+                    "value": false,
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  },
+                  "supportedFrameRateRange": {
+                    "status": "unsupported",
+                    "value": null,
+                    "unit": "frames_per_second",
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  }
+                }
+              ],
+              "note": "Point queries only for 720p30, 1080p30, and 1080p60; this is not an exhaustive size\/FPS matrix or runtime test."
+            },
+            "interpretation": "Range and alignment are codec constraints, not an exhaustive list of valid size\/FPS combinations."
+          }
+        },
+        "runtimeEncodeTest": {
+          "status": "not_runtime_tested",
+          "value": null,
+          "note": "No MediaCodec encoder was created or run."
+        },
+        "collectionIssues": []
+      },
+      {
+        "codecName": "c2.android.hevc.encoder",
+        "mimeType": "video\/hevc",
+        "hardwareAccelerated": {
+          "status": "advertised",
+          "value": false
+        },
+        "softwareOnly": {
+          "status": "advertised",
+          "value": true
+        },
+        "vendorCodec": {
+          "status": "advertised",
+          "value": false
+        },
+        "alias": {
+          "status": "advertised",
+          "value": false
+        },
+        "profileLevels": {
+          "status": "advertised",
+          "value": [
+            {
+              "profile": 1,
+              "profileName": "Main",
+              "level": 262144,
+              "levelName": "52"
+            },
+            {
+              "profile": 4,
+              "profileName": "MainStill",
+              "level": 262144,
+              "levelName": "52"
+            }
+          ]
+        },
+        "videoConstraints": {
+          "status": "advertised",
+          "value": {
+            "widthRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 2,
+                "upper": 512
+              },
+              "unit": "pixels"
+            },
+            "heightRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 2,
+                "upper": 512
+              },
+              "unit": "pixels"
+            },
+            "widthAlignment": {
+              "status": "advertised",
+              "value": 2,
+              "unit": "pixels"
+            },
+            "heightAlignment": {
+              "status": "advertised",
+              "value": 2,
+              "unit": "pixels"
+            },
+            "bitrateRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 1,
+                "upper": 10000000
+              },
+              "unit": "bits_per_second"
+            },
+            "frameRateRange": {
+              "status": "advertised",
+              "value": {
+                "lower": 1,
+                "upper": 300
+              },
+              "unit": "frames_per_second"
+            },
+            "bitrateModes": {
+              "status": "advertised",
+              "value": [
+                {
+                  "mode": 2,
+                  "name": "cbr",
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  }
+                },
+                {
+                  "mode": 1,
+                  "name": "vbr",
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  }
+                },
+                {
+                  "mode": 0,
+                  "name": "constant_quality",
+                  "supported": {
+                    "status": "advertised",
+                    "value": true
+                  }
+                }
+              ]
+            },
+            "representativeModeChecks": {
+              "status": "advertised",
+              "value": [
+                {
+                  "size": {
+                    "width": 1280,
+                    "height": 720
+                  },
+                  "frameRate": 30,
+                  "supported": {
+                    "status": "unsupported",
+                    "value": false,
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  },
+                  "supportedFrameRateRange": {
+                    "status": "unsupported",
+                    "value": null,
+                    "unit": "frames_per_second",
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  }
+                },
+                {
+                  "size": {
+                    "width": 1920,
+                    "height": 1080
+                  },
+                  "frameRate": 30,
+                  "supported": {
+                    "status": "unsupported",
+                    "value": false,
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  },
+                  "supportedFrameRateRange": {
+                    "status": "unsupported",
+                    "value": null,
+                    "unit": "frames_per_second",
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  }
+                },
+                {
+                  "size": {
+                    "width": 1920,
+                    "height": 1080
+                  },
+                  "frameRate": 60,
+                  "supported": {
+                    "status": "unsupported",
+                    "value": false,
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  },
+                  "supportedFrameRateRange": {
+                    "status": "unsupported",
+                    "value": null,
+                    "unit": "frames_per_second",
+                    "note": "This exact size\/FPS point is outside the advertised codec constraints."
+                  }
+                }
+              ],
+              "note": "Point queries only for 720p30, 1080p30, and 1080p60; this is not an exhaustive size\/FPS matrix or runtime test."
+            },
+            "interpretation": "Range and alignment are codec constraints, not an exhaustive list of valid size\/FPS combinations."
+          }
+        },
+        "runtimeEncodeTest": {
+          "status": "not_runtime_tested",
+          "value": null,
+          "note": "No MediaCodec encoder was created or run."
+        },
+        "collectionIssues": []
+      }
+    ]
+  },
+  "collectionIssues": [],
+  "accuracyNotes": [
+    "Camera and encoder entries report advertised metadata; no capture session or encode was run.",
+    "Camera stream sizes and FPS ranges are separate metadata. Their Cartesian product is not asserted as supported.",
+    "Camera and encoder lists do not prove an end-to-end compatible mode."
+  ]
+}

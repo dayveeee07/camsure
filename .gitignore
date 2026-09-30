@@ -1,0 +1,16 @@
+.deps/
+build*/
+stage/
+.vs/
+CMakeUserPresets.json
+*.user
+.CMakeBuildNumber
+
+# Android / Gradle local state
+.gradle/
+.kotlin/
+local.properties
+
+# Standalone Windows RTP receiver build output
+tools/windows-rtp-receiver/bin/
+tools/windows-rtp-receiver/obj/

@@ -1,0 +1,120 @@
+info: CPU Name: AMD Ryzen 5 3600 6-Core Processor              
+info: CPU Speed: 3600MHz
+info: Physical Cores: 6, Logical Cores: 12
+info: Physical Memory: 65461MB Total, 42552MB Free
+info: Windows Version: 10.0 Build 26200 (release: 25H2; revision: 9550; 64-bit)
+info: Running as administrator: false
+info: Windows 10/11 Gaming Features:
+info: 	Game Mode: Probably On (no reg key set)
+info: Sec. Software Status:
+info: 	Microsoft Defender Antivirus: enabled (AV)
+info: 	Windows Firewall: enabled (FW)
+debug: canvas 'Main' (6c69626f-6273-4c00-9d88-c5136d61696e) created
+info: ---------------------------------
+info: Initializing D3D11...
+info: Available Video Adapters: 
+info: 	Adapter 0: NVIDIA GeForce RTX 3060
+info: 	  Dedicated VRAM: 12703498240 (11.8 GiB)
+info: 	  Shared VRAM:    51461562368 (47.9 GiB)
+info: 	  PCI ID:         10de:2504
+info: 	  HAGS Status:    Enabled (Default: No, Driver status: Supported)
+info: 	  Driver Version: 32.0.15.9186
+info: 	  output 0:
+	    name=Odyssey G50F
+	    pos={0, 0}
+	    size={2560, 1440}
+	    attached=true
+	    refresh=180
+	    bits_per_color=8
+	    space=RGB_FULL_G22_NONE_P709
+	    primaries=[r=(0.650391, 0.342773), g=(0.294922, 0.663086), b=(0.153320, 0.036133), wp=(0.313477, 0.329102)]
+	    relative_gamut_area=[709=1.196872, P3=0.882299, 2020=0.632991]
+	    sdr_white_nits=80
+	    nit_range=[min=0.010000, max=1499.000000, max_full_frame=799.000000]
+	    dpi=96 (100%)
+	    id=\\?\DISPLAY#SAM79DC#5&2613b1f&0&UID168195#{e6f07b5f-ee97-4a90-b076-33f57bf4eaa7}
+	    alt_id=\\.\DISPLAY1
+info: Loading up D3D11 on adapter NVIDIA GeForce RTX 3060 (0)
+info: D3D11 loaded successfully, feature level used: b000
+info: DXGI increase maximum frame latency success
+warning: Hardware-Accelerated GPU Scheduling enabled on adapter!
+debug: set_priority: SetGPUThreadPriority failed
+info: D3D11 GPU priority setup failed (not admin?)
+info: ---------------------------------
+info: video settings reset:
+	base resolution:   1920x1080
+	output resolution: 1920x1080
+	downscale filter:  Bilinear
+	fps:               60/1
+	format:            RGBA
+	YUV mode:          None
+debug: ---------------------------------
+info: LoadLibrary failed for 'libobs-winrt': The specified module could not be found.
+ (126)
+debug: Loading module: obs-camsure.dll
+info: [CamSure] Plugin loaded (0.1.0)
+info: [CamSure] Source created [instance=1]
+debug: source 'Synthetic video probe' (camsure_camera) created
+info: [CamSure] Video pipe=camsure-test-video input=21 decoded=21 submitted=20 AU-dropped=0 frame-replaced=0 frame-stale=0 resets=2 errors=0 input-fps=20.62 decoded-fps=20.62 resolution=1920x1080 AU-age-max=16.29ms submit-to-decoded-max=4.13ms decoded-to-tick-max=15.49ms output-copy-max=0.53ms AU-inflight=1 decoded-depth=1/1 OBS-unbuffered=1
+info: [CamSure] Video pipe=camsure-test-video input=46 decoded=46 submitted=45 AU-dropped=0 frame-replaced=0 frame-stale=0 resets=3 errors=0 input-fps=18.25 decoded-fps=18.25 resolution=1920x1080 AU-age-max=16.30ms submit-to-decoded-max=4.13ms decoded-to-tick-max=16.34ms output-copy-max=0.53ms AU-inflight=1 decoded-depth=1/1 OBS-unbuffered=1
+info: [CamSure] Video pipe=camsure-test-video input=77 decoded=77 submitted=76 AU-dropped=0 frame-replaced=0 frame-stale=0 resets=3 errors=0 input-fps=21.76 decoded-fps=21.76 resolution=1920x1080 AU-age-max=16.39ms submit-to-decoded-max=4.13ms decoded-to-tick-max=29.58ms output-copy-max=0.76ms AU-inflight=1 decoded-depth=1/1 OBS-unbuffered=1
+info: [CamSure] Video pipe=camsure-test-video input=86 decoded=86 submitted=85 AU-dropped=0 frame-replaced=0 frame-stale=0 resets=5 errors=0 input-fps=12.72 decoded-fps=12.72 resolution=1920x1080 AU-age-max=16.39ms submit-to-decoded-max=4.46ms decoded-to-tick-max=29.58ms output-copy-max=0.76ms AU-inflight=1 decoded-depth=1/1 OBS-unbuffered=1
+info: [CamSure] Video pipe=camsure-test-video input=117 decoded=117 submitted=116 AU-dropped=0 frame-replaced=0 frame-stale=0 resets=5 errors=0 input-fps=14.99 decoded-fps=14.99 resolution=1920x1080 AU-age-max=16.74ms submit-to-decoded-max=4.46ms decoded-to-tick-max=29.58ms output-copy-max=0.76ms AU-inflight=1 decoded-depth=1/1 OBS-unbuffered=1
+info: [CamSure] Video pipe=camsure-test-video input=148 decoded=148 submitted=147 AU-dropped=0 frame-replaced=0 frame-stale=0 resets=5 errors=0 input-fps=16.75 decoded-fps=16.75 resolution=1920x1080 AU-age-max=16.74ms submit-to-decoded-max=4.46ms decoded-to-tick-max=29.58ms output-copy-max=0.76ms AU-inflight=1 decoded-depth=1/1 OBS-unbuffered=1
+info: [CamSure] Video stopped pipe=camsure-test-video input=160 decoded=160 submitted=160 dropped=0 resets=5 errors=0
+info: [CamSure] Source destroyed [instance=1]
+debug: source 'Synthetic video probe' destroyed
+info: [CamSure] Source created [instance=2]
+debug: source 'Idle video' (camsure_camera) created
+info: [CamSure] Video stopped pipe=camsure-test-idle input=0 decoded=0 submitted=0 dropped=0 resets=0 errors=0
+info: [CamSure] Source destroyed [instance=2]
+debug: source 'Idle video' destroyed
+info: [CamSure] Source created [instance=3]
+debug: source 'Idle video' (camsure_camera) created
+info: [CamSure] Video stopped pipe=camsure-test-idle input=0 decoded=0 submitted=0 dropped=0 resets=1 errors=0
+info: [CamSure] Source destroyed [instance=3]
+debug: source 'Idle video' destroyed
+info: [CamSure] Source created [instance=4]
+debug: source 'Idle video' (camsure_camera) created
+info: [CamSure] Video stopped pipe=camsure-test-idle input=0 decoded=0 submitted=0 dropped=0 resets=0 errors=0
+info: [CamSure] Source destroyed [instance=4]
+debug: source 'Idle video' destroyed
+info: [CamSure] Source created [instance=5]
+debug: source 'Idle video' (camsure_camera) created
+info: [CamSure] Video stopped pipe=camsure-test-idle input=0 decoded=0 submitted=0 dropped=0 resets=1 errors=0
+info: [CamSure] Source destroyed [instance=5]
+debug: source 'Idle video' destroyed
+info: [CamSure] Source created [instance=6]
+debug: source 'Idle video' (camsure_camera) created
+info: [CamSure] Video stopped pipe=camsure-test-idle input=0 decoded=0 submitted=0 dropped=0 resets=0 errors=0
+info: [CamSure] Source destroyed [instance=6]
+debug: source 'Idle video' destroyed
+info: [CamSure] Source created [instance=7]
+debug: source 'Idle video' (camsure_camera) created
+info: [CamSure] Video stopped pipe=camsure-test-idle input=0 decoded=0 submitted=0 dropped=0 resets=1 errors=0
+info: [CamSure] Source destroyed [instance=7]
+debug: source 'Idle video' destroyed
+info: [CamSure] Source created [instance=8]
+debug: source 'Idle video' (camsure_camera) created
+info: [CamSure] Video stopped pipe=camsure-test-idle input=0 decoded=0 submitted=0 dropped=0 resets=0 errors=0
+info: [CamSure] Source destroyed [instance=8]
+debug: source 'Idle video' destroyed
+info: [CamSure] Source created [instance=9]
+debug: source 'Idle video' (camsure_camera) created
+info: [CamSure] Video stopped pipe=camsure-test-idle input=0 decoded=0 submitted=0 dropped=0 resets=1 errors=0
+info: [CamSure] Source destroyed [instance=9]
+debug: source 'Idle video' destroyed
+info: [CamSure] Source created [instance=10]
+debug: source 'Idle video' (camsure_camera) created
+info: [CamSure] Video stopped pipe=camsure-test-idle input=0 decoded=0 submitted=0 dropped=0 resets=0 errors=0
+info: [CamSure] Source destroyed [instance=10]
+debug: source 'Idle video' destroyed
+info: [CamSure] Source created [instance=11]
+debug: source 'Idle video' (camsure_camera) created
+info: [CamSure] Video stopped pipe=camsure-test-idle input=0 decoded=0 submitted=0 dropped=0 resets=1 errors=0
+info: [CamSure] Source destroyed [instance=11]
+debug: source 'Idle video' destroyed
+PASS: synthetic RTP -> AU pipe -> native decoder -> OBS I420/GPU, 139 distinct frames; stop cleared output, restart, idle/partial-read removal x10, shutdown
+info: [CamSure] Plugin unloaded
+info: Freeing OBS context data
+debug: canvas 'Main' (6c69626f-6273-4c00-9d88-c5136d61696e) destroyed

@@ -1,0 +1,111 @@
+info: CPU Name: AMD Ryzen 5 3600 6-Core Processor              
+info: CPU Speed: 3600MHz
+info: Physical Cores: 6, Logical Cores: 12
+info: Physical Memory: 65461MB Total, 42549MB Free
+info: Windows Version: 10.0 Build 26200 (release: 25H2; revision: 9550; 64-bit)
+info: Running as administrator: false
+info: Windows 10/11 Gaming Features:
+info: 	Game Mode: Probably On (no reg key set)
+info: Sec. Software Status:
+info: 	Microsoft Defender Antivirus: enabled (AV)
+info: 	Windows Firewall: enabled (FW)
+debug: canvas 'Main' (6c69626f-6273-4c00-9d88-c5136d61696e) created
+info: ---------------------------------
+info: Initializing D3D11...
+info: Available Video Adapters: 
+info: 	Adapter 0: NVIDIA GeForce RTX 3060
+info: 	  Dedicated VRAM: 12703498240 (11.8 GiB)
+info: 	  Shared VRAM:    51461562368 (47.9 GiB)
+info: 	  PCI ID:         10de:2504
+info: 	  HAGS Status:    Enabled (Default: No, Driver status: Supported)
+info: 	  Driver Version: 32.0.15.9186
+info: 	  output 0:
+	    name=Odyssey G50F
+	    pos={0, 0}
+	    size={2560, 1440}
+	    attached=true
+	    refresh=180
+	    bits_per_color=8
+	    space=RGB_FULL_G22_NONE_P709
+	    primaries=[r=(0.650391, 0.342773), g=(0.294922, 0.663086), b=(0.153320, 0.036133), wp=(0.313477, 0.329102)]
+	    relative_gamut_area=[709=1.196872, P3=0.882299, 2020=0.632991]
+	    sdr_white_nits=80
+	    nit_range=[min=0.010000, max=1499.000000, max_full_frame=799.000000]
+	    dpi=96 (100%)
+	    id=\\?\DISPLAY#SAM79DC#5&2613b1f&0&UID168195#{e6f07b5f-ee97-4a90-b076-33f57bf4eaa7}
+	    alt_id=\\.\DISPLAY1
+info: Loading up D3D11 on adapter NVIDIA GeForce RTX 3060 (0)
+info: D3D11 loaded successfully, feature level used: b000
+info: DXGI increase maximum frame latency success
+warning: Hardware-Accelerated GPU Scheduling enabled on adapter!
+debug: set_priority: SetGPUThreadPriority failed
+info: D3D11 GPU priority setup failed (not admin?)
+info: ---------------------------------
+info: video settings reset:
+	base resolution:   1920x1080
+	output resolution: 1920x1080
+	downscale filter:  Bilinear
+	fps:               60/1
+	format:            RGBA
+	YUV mode:          None
+debug: ---------------------------------
+debug: Loading module: obs-camsure.dll
+info: LoadLibrary failed for 'libobs-winrt': The specified module could not be found.
+
+ (126)
+info: [CamSure] Plugin loaded (0.1.0)
+info: [CamSure] Source settings changed [instance=1, 1920x1080, 30 FPS]
+info: [CamSure] Source created [instance=1]
+debug: source 'Pulpit' (camsure_camera) created
+info: [CamSure] Source settings changed [instance=2, 1920x1080, 30 FPS]
+info: [CamSure] Source created [instance=2]
+debug: source 'Wide' (camsure_camera) created
+info: [CamSure] Source settings changed [instance=3, 1920x1080, 30 FPS]
+info: [CamSure] Source created [instance=3]
+debug: source 'Keyboard' (camsure_camera) created
+info: [CamSure] Source settings changed [instance=4, 1920x1080, 30 FPS]
+info: [CamSure] Source created [instance=4]
+debug: source 'Drums' (camsure_camera) created
+info: [CamSure] Source settings changed [instance=2, 1920x1080, 30 FPS]
+info: [CamSure] Source settings changed [instance=3, 1280x720, 60 FPS]
+info: [CamSure] Source settings changed [instance=5, 1920x1080, 30 FPS]
+info: [CamSure] Source created [instance=5]
+debug: source 'Pulpit Copy' (camsure_camera) created
+info: [CamSure] Source settings changed [instance=5, 1920x1080, 30 FPS]
+info: [CamSure] Source destroyed [instance=2]
+debug: source 'Wide' destroyed
+info: [CamSure] Source destroyed [instance=5]
+debug: source 'Pulpit Copy' destroyed
+info: [CamSure] Source created [instance=6]
+debug: source 'Wide Again' (camsure_camera) created
+info: [CamSure] Source destroyed [instance=1]
+debug: source 'CAM 1 Renamed' destroyed
+info: [CamSure] Source destroyed [instance=6]
+debug: source 'Wide Again' destroyed
+info: [CamSure] Source destroyed [instance=3]
+debug: source 'Keyboard' destroyed
+info: [CamSure] Source destroyed [instance=4]
+debug: source 'Drums' destroyed
+info: [CamSure] Source settings changed [instance=7, 1920x1080, 30 FPS]
+info: [CamSure] Source created [instance=7]
+debug: source 'CAM 1 Renamed' (camsure_camera) created
+info: [CamSure] Source created [instance=8]
+debug: source 'Wide Again' (camsure_camera) created
+info: [CamSure] Source settings changed [instance=9, 1280x720, 60 FPS]
+info: [CamSure] Source created [instance=9]
+debug: source 'Keyboard' (camsure_camera) created
+info: [CamSure] Source settings changed [instance=10, 1920x1080, 30 FPS]
+info: [CamSure] Source created [instance=10]
+debug: source 'Drums' (camsure_camera) created
+info: [CamSure] Source destroyed [instance=7]
+debug: source 'CAM 1 Renamed' destroyed
+info: [CamSure] Source destroyed [instance=8]
+debug: source 'Wide Again' destroyed
+info: [CamSure] Source destroyed [instance=9]
+debug: source 'Keyboard' destroyed
+info: [CamSure] Source destroyed [instance=10]
+debug: source 'Drums' destroyed
+info: [CamSure] Plugin unloaded
+info: Freeing OBS context data
+debug: canvas 'Main' (6c69626f-6273-4c00-9d88-c5136d61696e) destroyed
+PASS: four native D3D11 sources, independent edits/readbacks, duplicate, rename, enable, delete/recreate, save/load, shutdown.

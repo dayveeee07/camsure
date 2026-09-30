@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">CamSure Profiler</string>
+    <string name="profiler_title">CamSure Profiler</string>
+    <string name="profiler_subtitle">Camera capabilities and a one-camera hardware encoder experiment</string>
+    <string name="scan_explanation">A scan reads advertised metadata only. It does not open a camera preview or run an encoder.</string>
+    <string name="export_no_report">No completed report is available to export. Run a scan first.</string>
+</resources>
