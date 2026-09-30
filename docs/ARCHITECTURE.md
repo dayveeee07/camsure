@@ -479,3 +479,19 @@ preview hop. A USB adapter can publish the same local AU envelope without
 changing decoder or OBS frame code. See [the detailed boundaries](DECODE_OBS_REPORT.md)
 and TESTING.md section 19. Samsung one-phone OBS baseline is accepted with
 limitations; physical decoder metrics and calibrated latency remain unmeasured.
+
+## USB Network Mode Boundary (2026-09-30)
+
+USB Network Mode is implemented with physical qualification pending. Existing
+Camera2/MediaCodec -> compressed sink -> RTP packetizer uses an explicitly bound
+local IPv4 DatagramSocket over manually enabled Android USB tethering. Windows
+helper binds the selected adapter IPv4 and rejects foreign peer addresses before
+RTP parsing. Both modes publish the unchanged EncodedVideoAccessUnit into the
+shared pipe/VideoSession/decoder/native OBS path. LAN defaults are retained.
+Each USB run owns its socket, bounded queue, sender and link-monitor worker.
+Address/index/prefix loss or ambiguous peer route aborts the run. Windows helper
+terminates on adapter loss; reconnect requires reselection and fresh helper/phone
+stream, SSRC/generation/configuration/IDR. No second media pipeline, privileged
+tether activation, ADB/debugging or native USB protocol is introduced. Actual
+limits, ownership, telemetry and polling/OEM limitations are in
+[completion report](USB_NETWORK_REPORT.md).

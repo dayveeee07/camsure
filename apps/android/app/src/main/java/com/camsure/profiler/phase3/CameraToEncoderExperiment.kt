@@ -324,7 +324,8 @@ class CameraToEncoderExperiment(
     private val route: CameraRoute,
     private val plan: DirectModePlan,
     private val onSnapshot: (ExperimentSnapshot) -> Unit,
-    private val receiverEndpoint: FixedReceiverEndpoint? = null
+    private val receiverEndpoint: FixedReceiverEndpoint? = null,
+    private val usbLink: com.camsure.profiler.phase4.UsbNetworkLink? = null
 ) {
     private val appContext = context.applicationContext
     private val cameraManager = appContext.getSystemService(CameraManager::class.java)
@@ -431,7 +432,9 @@ class CameraToEncoderExperiment(
         if (terminal.get()) return
         try {
             if (receiverEndpoint != null) {
-                val sender = RtpH264Sender(receiverEndpoint)
+                val sender = RtpH264Sender(receiverEndpoint, usbLink) {
+                    handler.post { if (!terminal.get()) { streamSender?.close(); requestStop("USB link lost or send failed; select link and start a fresh stream.") } }
+                }
                 streamSender = sender
                 accessUnitSink = EncodedAccessUnitSink(
                     queue = sender.queue,
@@ -439,7 +442,7 @@ class CameraToEncoderExperiment(
                     onAccessUnitCompleted = ::recordCompletedAccessUnit
                 )
                 latestSnapshot = latestSnapshot.copy(
-                    pathDescription = "Camera2 writes directly to the MediaCodec input Surface. The LAN path copies only compressed H.264 access units into a pooled, bounded sender queue; it does not copy raw pixels or wait for network I/O.",
+                    pathDescription = "Camera2 writes directly to the MediaCodec input Surface. The RTP path copies only compressed H.264 access units into a pooled, bounded sender queue; it does not copy raw pixels or wait for network I/O.",
                     timestampCaveat = "MediaCodec PTS stays the source of truth. RTP uses a per-stream 90 kHz mapping; the prototype also carries exact source PTS in an RFC 8285 extension for receiver comparison."
                 )
             }
@@ -1092,6 +1095,14 @@ object RuntimeExperimentReportJson {
         return JSONObject()
             .put("protocol", "RTP/UDP with RFC 6184 H.264 non-interleaved packetization mode 1")
             .put("destination", transport.destination)
+            .put("transportMode", transport.transportMode)
+            .put("linkState", transport.linkState)
+            .put("inFlightStaleDrops", transport.inFlightStaleDrops)
+            .put("currentSenderFps", transport.currentSenderFps)
+            .put("currentRtpBitrateBps", transport.currentRtpBitrateBps)
+            .put("localAddress", transport.localAddress)
+            .put("localInterface", transport.localInterface)
+            .put("effectiveSendBufferBytes", transport.effectiveSendBufferBytes)
             .put("payloadType", transport.payloadType)
             .put("packetizationMode", transport.packetizationMode)
             .put("rtpClockHz", transport.timestampClockHz)

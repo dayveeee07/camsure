@@ -276,3 +276,12 @@ A feature is not done until it is:
 - measured when performance-sensitive
 - documented in `PROGRESS.md`
 - free of known critical regressions
+
+## Current USB Slice (2026-09-30)
+
+The user explicitly authorized USB Network Mode via manually enabled Android
+USB tethering. Implementation and host coverage are present; the user deferred
+physical acceptance. Read USB_NETWORK_REPORT.md / USB_NETWORK_TESTING.md before
+qualifying it. Preserve LAN defaults and the unchanged decoder/OBS boundary.
+Do not count source/build/synthetic/third-party evidence as physical USB proof.
+Controls, audio and multicamera implementation remain separately authorized slices.

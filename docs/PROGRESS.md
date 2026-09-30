@@ -2,11 +2,150 @@
 
 This file tracks verified implementation status.
 
+## 2026-10-01: Xiaomi USB readiness trial — ten-minute video baseline passed
+
+User confirms no visible drops for the completed 600.1009-second run in
+camsure-usb-network-20261001-051704.json, SSRC 2359927604, 720p/30 FPS.
+Android sent 17999 AUs and 241146 packets, with zero capture failures,
+send failures, queue drops or in-flight stale drops. Subtract the receiver's
+prior-SSRC baseline (1848 packets and 133 complete AUs) from final cumulative
+242994 packets and 18132 complete AUs: exactly 241146 packets and 17999
+complete AUs received. Zero gaps, incomplete, stale or oversized AUs. All 23
+PTS-map mismatch counts already existed before this SSRC began; no additional
+mismatches in the matched run. Bridge drop count remained 39 after startup.
+Tested combination: paced APK SHA256
+824CE1030AE5892203A2DF19D75999951D61521AD81D3E74444A04B25796F189,
+usb-readiness receiver, explicit 256 KiB socket receive buffer.
+
+This is one phone/PC ten-minute proof, not an isolated proof of the timeout
+race hypothesis or two-hour/multiphone qualification. Battery fell 9% to 7%,
+temperature 44.7 to 45 C, thermal status none. The experiment still stops at
+ten minutes and requires a separate service-duration slice before two-hour
+use. Receiver log terminates with Interrupted after media completion; stop
+versus genuine link-loss classification requires follow-up.
+
+## 2026-10-01: USB readiness-based receive trial
+
+NIC capture had contiguous RTP sequences while receiver gap count increased.
+To investigate loss in the Windows receive path, USB now waits for socket
+readiness with Poll(25 ms), then uses a receive without SO_RCVTIMEO. This
+avoids repeatedly timing out receive operations between 30 FPS bursts.
+A timeout/cancellation race is a hypothesis, not a diagnosed platform defect.
+Idle iterations still expire incomplete AUs at the existing 100 ms deadline;
+link monitor socket closure and operator stop remain in place. LAN behavior
+and selected buffer size are unchanged. Build and self-tests pass, including
+idle readiness and 128 sequential loopback sends/receives. Artifact:
+tools/windows-rtp-receiver/bin/usb-readiness. Physical result remains pending.
+
+Early physical result: user reports two minutes without visible drops. At
+receiver t=2:44, cumulative 62064 packets, 4584 complete AUs, zero sequence
+gaps/incomplete/stale AUs. Bridge drops are 39 (including startup), with one
+connection/error and two generations observed. PTS-map mismatches total 23
+and require separate examination; nonmonotonic PTS remain zero. This is an
+encouraging short-run result, not ten-minute or two-hour service qualification.
+
+## 2026-10-01: First NIC ingress capture result
+
+User reports no visible drops during the minute. Capture
+usb-capture-20261001-050209.pcapng contains 24388 RTP packets for SSRC
+2642161008 from 21:02:09.619782Z to 21:03:09.736135Z. Header parsing finds
+zero sequence gaps, adjacent duplicates, or backwards sequences. Packet
+Monitor conversion reports zero capture drops (not end-to-end delivery proof).
+During the corresponding receiver interval (~t=7:48 to 8:49), receiver gaps
+increase from 15 to 16, first reported at t=8:33. This points toward loss
+between observed NIC ingress and receiver processing. Exact gap sequence
+logging is needed to align the missing datagram directly; capture can affect
+runtime timing. One visually clean minute does not establish stability.
+
+## 2026-10-01: Windows ingress capture preparation
+
+Added tools/windows-rtp-receiver/capture-usb.ps1 for a 60-second NIC capture
+using installed Windows Packet Monitor, filtered by phone IP and UDP port.
+Captures 160-byte packet headers to a bounded 128 MiB log and exports pcapng.
+Preserves existing filters; any pre-existing filters can broaden capture.
+Removes only its own filter and stops only a capture it successfully started.
+PowerShell syntax checked. Packet Monitor requires Windows Administrator;
+this session's status query returned Access denied. Capture is not yet run.
+NIC ingress RTP sequences can be compared against the matched receiver log;
+capture loss/duplicate observations must be considered before attribution.
+
+## 2026-10-01: USB sender burst pacing trial — physical acceptance pending
+
+The user reports 7–8 visible drops within one minute with the timing helper.
+At receiver t=2:36 the log has 9 missing packets and 9 incomplete AUs,
+maximum application service pause 2.538 ms, receive wait 39.405 ms, and
+maximum observed 1 ms bucket 51600 bytes. These cumulative observations do
+not isolate the kernel/driver or prove burst-induced loss.
+Added USB-only sender pacing: at most eight datagrams (up to 9600 bytes) per
+batch, with at least 1 ms between batch starts. Idle time accumulates no
+burst credit, early wakeups are rechecked, and interruption propagates to
+shutdown. Pacing executes on the sender worker, retaining the 100 ms AU
+freshness checks, bounded sender queue, camera resolution/FPS and LAN path.
+This is a bounded hypothesis test, not a confirmed fix. Android build/unit
+tests/lint results and the physical follow-up must be recorded separately.
+
+Validation: assembleDebug, testDebugUnitTest (four tests, zero failures/errors),
+and lintDebug passed. APK SHA256:
+824CE1030AE5892203A2DF19D75999951D61521AD81D3E74444A04B25796F189.
+Physical follow-up: install this APK, retain the usb-timing helper and 256 KiB
+receive-buffer trial, and export a fresh phone JSON after the movement run.
+
+Physical result: report camsure-usb-network-20261001-045621.json, SSRC
+4099601097, duration 101.854 s, 3048 encoded/sent AUs, 41217 successfully sent
+packets. Receiver has 41209 packets, 3040 complete plus 8 incomplete AUs,
+8 sequence gaps, no restart. Sender queue drops, send failures, in-flight stale
+drops and capture failures are zero. Observed 1 ms receive bucket maximum
+fell to 19200 bytes, but packet loss persists (approximately 4.7 packets/minute
+versus 4.4/minute in the preceding matched 162.47 s buffer trial). The user
+reports under five visible drops per minute. Different movement/run lengths
+prevent a controlled comparison; no packet-loss improvement is established.
+Next: paired packet capture at sender/Windows ingress, or Windows ingress
+capture plus receive counters, to isolate loss before further tuning.
+
+## 2026-10-01: Receiver timing diagnostics — implemented, host tested
+
+Added constant-space receive timing counters: maximum service pause between
+a successful receive and the next receive call, maximum blocking receive wait,
+and maximum bytes observed in a one-millisecond bucket starting on receipt.
+These are application observations, not kernel arrival timestamps or proof of
+socket overflow. Timeout idle periods are excluded from service pauses.
+Build and receiver self-tests, including deterministic service/burst/idle
+accounting, pass. Artifact: tools/windows-rtp-receiver/bin/usb-timing.
+Physical correlation remains pending. Resolution, FPS, buffer defaults,
+freshness deadlines, sender behavior, and decoder behavior remain unchanged.
+
+## 2026-10-01: USB receive burst-buffer trial — physical result pending
+
+The refined single-phone run still stutters. At receiver t=4:24, SSRC
+1581680764 reports 22 packet gaps, 22 incomplete AUs, 313 bridge drops,
+no stream restart, and a largest reconstructed AU of 122348 bytes versus a
+65536-byte effective Windows receive buffer. Burst overflow is a hypothesis;
+receiver gaps cannot distinguish sender loss from OS loss.
+Added explicit USB-only `--receive-buffer-kib` (64–256, default 64) for a
+bounded 256 KiB comparison. LAN defaults, application AU deadline (100 ms),
+and decoder/OBS behavior remain unchanged. Build and receiver self-tests pass.
+Physical improvement and end-to-end latency remain unverified.
+Trial artifact: tools/windows-rtp-receiver/bin/usb-buffer-trial.
+
+Physical follow-up: Xiaomi SSRC 2001963800 ran 162.47 seconds, sending 4867
+AUs and 65868 packets with zero sender queue drops, stale drops, or send
+failures. After subtracting the preceding SSRC, Windows received 65856 packets,
+4855 complete AUs and 12 incomplete AUs, with 12 missing packets. The user
+reports slight improvement but two visible drops in under 30 seconds. The
+buffer trial is not a fix; loss remains between socket send acceptance and
+Windows receipt. See evidence/2026-10-01-usb-buffer-trial-analysis.md.
+
 Do not use it as a wishlist.
 
 ---
 
 ## Current Status
+
+**2026-09-30 newest slice:** USB Network Mode implementation and host coverage
+are delivered; STATUS PARTIAL pending physical qualification deferred by user.
+LAN remains the default and the native decoder/OBS path is unchanged. See
+[USB report](USB_NETWORK_REPORT.md) and [physical setup/checklist](USB_NETWORK_TESTING.md).
+The following accepted decode baseline remains valid historical LAN evidence.
 
 **2026-09-30 current slice:** Transport-Neutral Decode → OBS is ACCEPTED WITH
 LIMITATIONS on the Samsung one-camera baseline.
@@ -38,8 +177,9 @@ follow-up RTP run were reported after selecting the discovered receiver; the
 Windows log shows complete access units and no observed loss during the sample.
 Decode and OBS ingest remain unevidenced.
 
-**Primary next slice:** CamSure USB Transport Foundation, subject to a separately
-authorized implementation scope. Existing Phase 4 follow-ups remain separate:
+**Primary next slice:** Physical USB Network Mode qualification using the
+prepared build and USB_NETWORK_TESTING.md; implementation is now authorized
+and delivered. Existing Phase 4 follow-ups remain separate:
 [Phase 4 Q-007 discovery procedure](TESTING.md#18-phase-4--rtph264-over-lan-and-q-007-local-discovery)
 on the Samsung SM-X115 with WAN disconnected; capture firewall, receiver
 restart, and network reconnect behavior. Separately perform the Q-001 protocol
@@ -856,3 +996,44 @@ The current run already demonstrates the basic discovery-to-RTP path; a longer
 soak can supply separate duration evidence. Run the distinct Q-001 protocol
 trade-off and loss/recovery test afterward. Do not close Q-001 or the Phase 4
 exit gate based on a clean short run.
+
+## 2026-09-30 - USB Network Mode implementation
+
+**Status:** PARTIAL; user explicitly deferred physical testing. Added explicit
+Android USB selection/local bind, bounded USB queue and independent link monitor;
+Windows adapter/address/peer selection, exact bind, pre-parser peer isolation,
+100 ms reassembly and session/retired-SSRC handling. Reuses existing RTP/AU/pipe/
+decoder/OBS; native runtime code unchanged. Manual tethering, no ADB/debugging
+requirement. LAN defaults preserved. No audio/controls/multicamera added.
+
+**Tests:** Android assemble/lint and focused subnet/queue/stall/abort/LAN-default
+unit tests pass; .NET build and USB plus existing RTP self-tests pass. Shared
+synthetic native pipeline passes 720p/1080p exact PTS, induced loss/restart,
+132 distinct OBS GPU frames, stop-clear and idle/partial-read teardown x10.
+These are host/simulated results. USB route/OBS/600 s/latency/ten cable cycles/
+consumer stall/frontend lifecycle and physical LAN regression are NOT RUN.
+No USB throughput, FPS, recovery or glass-to-glass values are claimed.
+
+**Limitations/next:** Operator must confirm candidate USB hardware; polling/OEM
+visibility and route need physical qualification. Complete the prepared A-H
+checklist before evaluating Camera Manual Controls Foundation. See
+[report](USB_NETWORK_REPORT.md) for limits, telemetry and files.
+
+**2026-10-01 final build handoff:** Prepared APK and isolated Windows helper;
+see the report for artifact hashes and final Android build/unit/lint evidence.
+Physical acceptance remains deferred by the user.
+
+## 2026-10-01 - USB receive-loop scheduling refinement
+
+User reports drops persist with only one CamSure source. Latest receiver log
+still records packet gaps; duplicated source pipes are not the entire cause.
+The Xiaomi ten-minute report had zero sender queue/send drops. Receiver console
+output (including Tee-Object backpressure) and adapter enumeration ran inline
+with UDP reception. These are plausible local receive stalls, not proven USB
+packet-loss attribution. Move console reports to one bounded latest snapshot
+worker and adapter polling to a separate cancelable task that closes the socket
+on link loss. Keep USB socket/reassembly/AU limits and decoder/OBS unchanged.
+Build/self-tests pass, including a blocked telemetry sink with 1,000 publications
+and one pending snapshot. Physical retest is required; this is not a fixed claim.
+Prepared helper: tools/windows-rtp-receiver/bin/usb-refinement/CamSure.RtpReceiver.dll.
+No Android APK change is required for this refinement.

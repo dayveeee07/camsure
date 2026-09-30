@@ -22,6 +22,7 @@ internal static class ReceiverSelfTest
     }
     public static int Run()
     {
+        UsbNetworkSelfTest.Run();
         var sink = new Sink(); var receiver = new RtpH264Receiver(sink);
         void Send(ushort sequence, uint timestamp, long pts, byte[] nal, bool marker, bool key, uint stream = 9)
         {

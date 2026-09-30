@@ -343,3 +343,21 @@ own DLLs. Public distribution needs exact corresponding-source/build compliance.
 See [completion report](DECODE_OBS_REPORT.md) for evaluated alternatives,
 ownership, timing, measurements and limits. Synthetic tests are not real-phone
 OBS acceptance. USB, audio, controls and multicamera are outside this slice.
+
+## D-022 — USB Network Mode via Android USB Tethering
+
+**Status:** ACTIVE implementation choice; physical acceptance OPEN (2026-09-30).
+
+Reuse the LAN RTP/H.264 stream and transport-neutral AU/decoder/OBS path over
+manually enabled USB tethering. LAN stays default. Require explicit local
+address/adapter and peer selection, subnet/ambiguity checks, socket binding and
+fail-closed link/session teardown; no route fallback. USB queue/reassembly age
+is 100 ms and requested socket buffers are 64 KiB. No native USB bulk, UVC,
+AOA, WinUSB, ADB forwarding or debugging transport is implemented. ADB is not
+required for operation. Custom AOA/native USB is only a possible future fallback.
+Manual confirmation/capture establishes physical USB identity; interface names
+and subnets alone do not. See USB_NETWORK_REPORT.md and USB_NETWORK_TESTING.md.
+
+Platform binding uses the public [Android DatagramSocket API](https://developer.android.com/reference/java/net/DatagramSocket).
+API 36 exposes [tethered-interface callbacks](https://developer.android.com/reference/android/net/TetheringManager.TetheringEventCallback);
+this API 26+ slice uses operator selection and interface monitoring throughout.

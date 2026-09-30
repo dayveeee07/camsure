@@ -105,3 +105,15 @@ decision.
 Standards references: [RTP (RFC 3550)](https://www.rfc-editor.org/rfc/rfc3550),
 [H.264 RTP payload format (RFC 6184)](https://www.rfc-editor.org/rfc/rfc6184),
 and [RTP header extensions (RFC 8285)](https://www.rfc-editor.org/rfc/rfc8285).
+
+## USB Network Mode
+
+Use `--list-adapters`, confirm the tethering Ethernet adapter in Windows Settings,
+then explicitly select `--transport usb --adapter ID --bind LOCAL_IPV4 --peer
+ANDROID_IPV4 --port 5004 --obs-pipe camsure-camera-1`. Unknown/ambiguous/duplicate
+addresses and off-subnet peers fail. The socket binds only that IPv4; peer
+filtering precedes RTP parsing. USB disables LAN discovery and uses 64 KiB
+requested buffers / 100 ms reassembly. Existing LAN CLI/defaults remain available.
+On link loss the process exits; reselect and restart it with a new Android stream.
+No native OBS change is needed. See ../../docs/USB_NETWORK_TESTING.md and
+../../docs/USB_NETWORK_REPORT.md for evidence boundaries and prepared commands.

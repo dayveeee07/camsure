@@ -4,6 +4,7 @@ import android.media.MediaCodec
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
+import java.net.InetSocketAddress
 import java.security.SecureRandom
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.roundToLong
@@ -57,20 +58,43 @@ data class RtpH264TransportSnapshot(
     val lastSentPresentationTimeUs: Long?,
     val timestampOriginPresentationTimeUs: Long?,
     val sink: AccessUnitSinkSnapshot,
-    val queue: AccessUnitQueueSnapshot
+    val queue: AccessUnitQueueSnapshot,
+    val transportMode: String,
+    val localAddress: String?,
+    val localInterface: String?,
+    val effectiveSendBufferBytes: Int,
+    val linkState: String,
+    val inFlightStaleDrops: Long,
+    val currentSenderFps: Double,
+    val currentRtpBitrateBps: Double
 )
 
 /** RTP/UDP experiment sender, owned by exactly one camera/encoder run. */
 class RtpH264Sender(
-    private val endpoint: FixedReceiverEndpoint
+    private val endpoint: FixedReceiverEndpoint,
+    private val usbLink: UsbNetworkLink? = null,
+    private val onLinkLost: () -> Unit = {}
 ) : AutoCloseable {
-    internal val queue = BoundedAccessUnitQueue()
+    internal val queue = if (usbLink == null) BoundedAccessUnitQueue() else BoundedAccessUnitQueue(maxQueuedUnits = 4, maxQueueAgeMs = 100)
+    @Volatile private var effectiveSendBufferBytes = 0
+    private var nextLinkCheckNs = 0L
+    @Volatile private var linkState = if (usbLink == null) "not_applicable" else "checking"
     private val secureRandom = SecureRandom()
     private val ssrc = secureRandom.nextInt().toLong() and UINT32_MASK
     private val sequence = AtomicLong(secureRandom.nextInt(0x10000).toLong())
     private val packetCount = AtomicLong()
+    private val sentByteCount = AtomicLong()
+    private val usbPacketPacer = if (usbLink == null) null else UsbPacketPacer()
+    private var rateSampleAtNs = android.os.SystemClock.elapsedRealtimeNanos()
+    private var rateSampleUnits = 0L
+    private var rateSampleBytes = 0L
+    private var senderFps = 0.0
+    private var rtpBitrateBps = 0.0
     private val accessUnitCount = AtomicLong()
     private val sendFailureCount = AtomicLong()
+    private val inFlightStaleCount = AtomicLong()
+    private class StaleUsbAccessUnit : Exception()
+    private var sendingQueuedAtNs = 0L
     private val malformedUnitCount = AtomicLong()
     private val missingConfigCount = AtomicLong()
     private val lock = Any()
@@ -83,8 +107,21 @@ class RtpH264Sender(
     @Volatile private var disposed = false
     private val worker = Thread(::sendLoop, "camsure-phase4-rtp-sender").apply {
         isDaemon = true
-        start()
     }
+    private val linkMonitor = if (usbLink == null) null else Thread({
+        while (!disposed && worker.isAlive) {
+            if (!usbLink.hasExclusivePeerRoute(endpoint.address)) {
+                linkState = "lost_or_failed"
+                queue.abort()
+                socket?.close() // releases a worker blocked in send, independently of that worker
+                worker.interrupt()
+                onLinkLost()
+                break
+            }
+            try { Thread.sleep(100) } catch (_: InterruptedException) { break }
+        }
+    }, "camsure-usb-link-monitor").apply { isDaemon = true }
+    init { worker.start(); linkMonitor?.start() }
 
     internal fun setCodecConfiguration(configuration: CodecConfiguration) {
         synchronized(lock) { codecConfiguration = configuration }
@@ -92,6 +129,17 @@ class RtpH264Sender(
 
     fun snapshot(sink: AccessUnitSinkSnapshot): RtpH264TransportSnapshot {
         val origin = synchronized(lock) { timestampOriginPtsUs }
+        val rates = synchronized(lock) {
+            val now = android.os.SystemClock.elapsedRealtimeNanos()
+            val seconds = (now - rateSampleAtNs) / 1_000_000_000.0
+            if (seconds >= 0.5) {
+                val units = accessUnitCount.get(); val bytes = sentByteCount.get()
+                senderFps = (units - rateSampleUnits) / seconds
+                rtpBitrateBps = (bytes - rateSampleBytes) * 8.0 / seconds
+                rateSampleUnits = units; rateSampleBytes = bytes; rateSampleAtNs = now
+            }
+            Pair(senderFps, rtpBitrateBps)
+        }
         return RtpH264TransportSnapshot(
             state = state,
             destination = endpoint.display,
@@ -108,7 +156,15 @@ class RtpH264Sender(
             lastSentPresentationTimeUs = lastSentPtsUs,
             timestampOriginPresentationTimeUs = origin,
             sink = sink,
-            queue = queue.snapshot()
+            queue = queue.snapshot(),
+            transportMode = (if (usbLink == null) TransportMode.LAN else TransportMode.USB_NETWORK).name,
+            localAddress = usbLink?.address?.hostAddress,
+            localInterface = usbLink?.interfaceName,
+            effectiveSendBufferBytes = effectiveSendBufferBytes,
+            linkState = linkState,
+            inFlightStaleDrops = inFlightStaleCount.get(),
+            currentSenderFps = rates.first,
+            currentRtpBitrateBps = rates.second
         )
     }
 
@@ -123,7 +179,11 @@ class RtpH264Sender(
         queue.abort()
         try { socket?.close() } catch (_: Exception) {}
         worker.interrupt()
+        linkMonitor?.interrupt()
         joinWorker(500)
+        if (Thread.currentThread() !== linkMonitor) {
+            try { linkMonitor?.join(500) } catch (_: InterruptedException) { Thread.currentThread().interrupt() }
+        }
         state = "stopped"
     }
 
@@ -133,12 +193,30 @@ class RtpH264Sender(
         if (worker.isAlive) close()
     }
 
+    private fun checkUsbLink() {
+        if (usbLink == null) return
+        val now = android.os.SystemClock.elapsedRealtimeNanos()
+        if (now >= nextLinkCheckNs) {
+            check(usbLink.hasExclusivePeerRoute(endpoint.address)) { "USB link lost" }
+            nextLinkCheckNs = now + 100_000_000L
+        }
+    }
+
     private fun sendLoop() {
         val packetBytes = ByteArray(MAX_RTP_PACKET_BYTES)
         try {
-            socket = DatagramSocket()
+            socket = if (usbLink == null) DatagramSocket() else DatagramSocket(null)
+            if (usbLink != null) {
+                check(usbLink.hasExclusivePeerRoute(endpoint.address)) { "Selected USB link/peer is unavailable" }
+                socket!!.sendBufferSize = 64 * 1024
+                socket!!.bind(InetSocketAddress(usbLink.address, 0))
+                socket!!.connect(endpoint.address, endpoint.port)
+            }
+            effectiveSendBufferBytes = socket!!.sendBufferSize
+            if (usbLink != null) linkState = "up"
             state = "streaming"
             while (!disposed) {
+                checkUsbLink()
                 val unit = queue.poll(100)
                 if (unit == null) {
                     if (queue.isClosedAndEmpty()) break
@@ -146,9 +224,14 @@ class RtpH264Sender(
                 }
                 unit.use {
                     try {
+                        sendingQueuedAtNs = it.queuedAtNs
                         sendAccessUnit(it, packetBytes)
                         state = "streaming"
-                    } catch (_: Exception) {
+                    } catch (_: StaleUsbAccessUnit) {
+                        inFlightStaleCount.incrementAndGet()
+                        queue.requestKeyFrameRecovery()
+                    } catch (sendError: Exception) {
+                        if (usbLink != null) throw sendError
                         sendFailureCount.incrementAndGet()
                         state = "send_error"
                         queue.requestKeyFrameRecovery()
@@ -161,6 +244,7 @@ class RtpH264Sender(
                 state = "failed"
                 sendFailureCount.incrementAndGet()
                 queue.abort()
+                if (usbLink != null) { linkState = "lost_or_failed"; onLinkLost() }
             }
         } finally {
             try { socket?.close() } catch (_: Exception) {}
@@ -291,6 +375,9 @@ class RtpH264Sender(
         extensionFlags: Int,
         marker: Boolean
     ) {
+        usbPacketPacer?.beforePacket()
+        checkUsbLink()
+        if (usbLink != null && android.os.SystemClock.elapsedRealtimeNanos() - sendingQueuedAtNs > 100_000_000L) throw StaleUsbAccessUnit()
         packetBytes[0] = RTP_VERSION_AND_EXTENSION.toByte()
         packetBytes[1] = (PAYLOAD_TYPE or if (marker) 0x80 else 0).toByte()
         val seq = sequence.getAndIncrement() and 0xffffL
@@ -319,8 +406,11 @@ class RtpH264Sender(
         }
         try {
             val datagram = DatagramPacket(packetBytes, RTP_HEADER_BYTES + payloadLength, endpoint.address, endpoint.port)
+            checkUsbLink()
+            if (usbLink != null && android.os.SystemClock.elapsedRealtimeNanos() - sendingQueuedAtNs > 100_000_000L) throw StaleUsbAccessUnit()
             socket?.send(datagram) ?: throw IllegalStateException("RTP socket is not available.")
             packetCount.incrementAndGet()
+            sentByteCount.addAndGet(datagram.length.toLong())
         } catch (error: Exception) {
             throw error
         }

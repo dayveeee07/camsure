@@ -1,10 +1,11 @@
 # Synthetic host integration only. Does not operate OBS frontend/Android.
+param([string]$ReceiverDll)
 $ErrorActionPreference = 'Stop'
 $testRoot = Split-Path -Parent $PSScriptRoot
 $repoRoot = (Resolve-Path "$testRoot/../..").Path
 $buildRoot = "$testRoot/build_vs2026"
 $obsBin = 'C:/Program Files/obs-studio/bin/64bit'
-$receiverDll = "$repoRoot/tools/windows-rtp-receiver/bin/Debug/net10.0/CamSure.RtpReceiver.dll"
+if (!$ReceiverDll) { $ReceiverDll = "$repoRoot/tools/windows-rtp-receiver/bin/Debug/net10.0/CamSure.RtpReceiver.dll" }
 $oldPath = $env:PATH
 $videoProbe = $null
 $receiverProbe = $null

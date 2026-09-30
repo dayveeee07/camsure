@@ -140,9 +140,8 @@ One 1080p stream can run for an extended test without latency continuously incre
 OBS async source are implemented; synthetic GPU/loss/restart/lifecycle tests
 pass. Samsung real-camera output, the ten-minute run and stream/source/OBS
 recovery are user-confirmed; Phase 5 baseline is ACCEPTED WITH LIMITATIONS.
-See TESTING.md section 19 for remaining measurement limits. USB remains
-unimplemented; USB Transport Foundation is the next candidate, requiring a
-separately authorized implementation slice.
+See TESTING.md section 19 for remaining measurement limits. USB Network Mode is now implemented in the separately authorized slice below;
+physical USB qualification remains open. Native/custom USB remains deferred.
 
 ## Goal
 
@@ -345,3 +344,11 @@ Synchronized Cameras
 ```
 
 Do not sacrifice the low-latency path by default.
+
+# USB Network Mode - Authorized slice after accepted Phase 5 baseline
+
+**2026-09-30:** Implemented using Android USB tethering and shared RTP/H.264;
+physical qualification deferred by user. Follow USB_NETWORK_TESTING.md. Exit
+requires physical route/OBS/soak/latency/cable/consumer/lifecycle/LAN checks.
+After acceptance, evaluate Camera Manual Controls Foundation; do not implement
+controls as part of USB qualification. Native USB remains a possible future fallback.

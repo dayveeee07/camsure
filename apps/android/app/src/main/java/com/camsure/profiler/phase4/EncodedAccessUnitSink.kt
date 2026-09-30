@@ -285,7 +285,8 @@ class EncodedAccessUnitSink internal constructor(
 internal class BoundedAccessUnitQueue(
     private val maxQueuedBytes: Int = 512 * 1024,
     private val maxQueueAgeMs: Long = 500,
-    private val maxQueuedUnits: Int = 24
+    private val maxQueuedUnits: Int = 24,
+    private val nowNanos: () -> Long = SystemClock::elapsedRealtimeNanos
 ) {
     private data class Queued(val payload: EncodedAccessUnit, val queuedAtNs: Long)
 
@@ -306,7 +307,7 @@ internal class BoundedAccessUnitQueue(
     private var recoveryFlushUnits = 0L
 
     fun offer(payload: PooledPayload, ptsUs: Long, flags: Int, keyFrame: Boolean) {
-        val nowNs = SystemClock.elapsedRealtimeNanos()
+        val nowNs = nowNanos()
         synchronized(lock) {
             expireLocked(nowNs)
             if (closed) {
@@ -357,10 +358,10 @@ internal class BoundedAccessUnitQueue(
     }
 
     fun poll(timeoutMs: Long): EncodedAccessUnit? {
-        val deadline = SystemClock.elapsedRealtimeNanos() + timeoutMs * 1_000_000L
+        val deadline = nowNanos() + timeoutMs * 1_000_000L
         synchronized(lock) {
             while (items.isEmpty() && !closed) {
-                val remainingNs = deadline - SystemClock.elapsedRealtimeNanos()
+                val remainingNs = deadline - nowNanos()
                 if (remainingNs <= 0) return null
                 try {
                     lock.wait((remainingNs / 1_000_000L).coerceAtLeast(1L))
@@ -369,7 +370,7 @@ internal class BoundedAccessUnitQueue(
                     return null
                 }
             }
-            expireLocked(SystemClock.elapsedRealtimeNanos())
+            expireLocked(nowNanos())
             if (items.isEmpty()) return null
             val item = items.removeFirst()
             bytes -= item.payload.size
@@ -407,7 +408,7 @@ internal class BoundedAccessUnitQueue(
     }
 
     fun snapshot(): AccessUnitQueueSnapshot = synchronized(lock) {
-        val nowNs = SystemClock.elapsedRealtimeNanos()
+        val nowNs = nowNanos()
         updateHighWaterLocked(nowNs)
         val oldest = items.peekFirst()
         val newest = items.peekLast()

@@ -203,6 +203,11 @@ Do not implement merely because the phone reports HDR capability.
 
 ## Q-011 — Native USB Production Transport
 
+**2026-09-30 update:** USB Network Mode is implemented via manual Android USB
+tethering, without ADB/debugging, using shared RTP/H.264 and decoder/OBS. Physical
+acceptance is pending; the user elected to test later. Native USB/AOA is only a
+possible future fallback. See USB_NETWORK_REPORT.md. Older rationale follows.
+
 ADB forwarding may be useful for development.
 
 Production USB needs a user-friendly approach without requiring USB debugging.

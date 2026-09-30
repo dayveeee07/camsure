@@ -73,6 +73,11 @@ class MainActivity : Activity() {
     private var phase3PlanMessage = "Prepare camera routes to inspect direct modes."
     private var runtimeReportExported = false
     private var activityDestroyed = false
+    private lateinit var usbMode: android.widget.CheckBox
+    private lateinit var usbAddresses: Spinner
+    private lateinit var usbPort: EditText
+    private lateinit var usbStatus: TextView
+    private var usbCandidates = emptyList<com.camsure.profiler.phase4.UsbNetworkLink>()
     private var receiverDiscovery: NsdReceiverDiscovery? = null
     private var discoveredReceivers: List<DiscoveredReceiver> = emptyList()
     private var selectedDiscoveredReceiver: DiscoveredReceiver? = null
@@ -331,7 +336,7 @@ class MainActivity : Activity() {
     private fun startPhase3Experiment() {
         val route = selectedCameraRoute ?: return
         val receiverText = phase4ReceiverIp.text?.toString()?.trim().orEmpty()
-        val receiverEndpoint = if (receiverText.isBlank()) {
+        var receiverEndpoint = if (receiverText.isBlank()) {
             selectedDiscoveredReceiver?.endpoint
         } else {
             FixedReceiverEndpoint.parseIPv4(receiverText)
@@ -340,6 +345,16 @@ class MainActivity : Activity() {
             phase3PlanMessage = "Enter a numeric IPv4 address for the fixed receiver on UDP port 5004, or leave it blank for capture only."
             renderPhase3()
             return
+        }
+        if (usbMode.isChecked) {
+            val port = usbPort.text.toString().toIntOrNull()
+            if (port == null || port !in 1..65535) { phase3PlanMessage = "Enter a USB media port from 1 to 65535."; renderPhase3(); return }
+            receiverEndpoint = receiverEndpoint?.copy(port = port)
+        }
+        val selectedUsb = if (usbMode.isChecked) usbCandidates.getOrNull(usbAddresses.selectedItemPosition - 1) else null
+        if (usbMode.isChecked && (selectedUsb == null || !selectedUsb.isPresent() || receiverEndpoint == null || !selectedUsb.hasExclusivePeerRoute(receiverEndpoint.address))) {
+            phase3PlanMessage = "USB not ready: enable USB tethering, refresh and explicitly select its local address, then enter the PC address on that link."
+            renderPhase3(); return
         }
         val plan = directModePlans.firstOrNull()
         if (plan == null) {
@@ -400,7 +415,8 @@ class MainActivity : Activity() {
             }
             renderPhase3()
             },
-            receiverEndpoint = receiverEndpoint
+            receiverEndpoint = receiverEndpoint,
+            usbLink = selectedUsb
         ).also { it.start() }
         renderPhase3()
     }
@@ -449,13 +465,13 @@ class MainActivity : Activity() {
             setBackgroundColor(0xFFFFFFFF.toInt())
         }
         panel.addView(TextView(this).apply {
-            text = "Phase 3 / 4 · Camera to hardware encoder and LAN"
+            text = "Camera to hardware encoder and RTP"
             textSize = 17f
             setTextColor(0xFF182022.toInt())
             typeface = Typeface.DEFAULT_BOLD
         }, matchWrap())
         panel.addView(TextView(this).apply {
-            text = "Prepare permission-gated camera routes, then run the highest exact 30 fps mode shared by Camera2 and a hardware H.264 encoder. Find a local receiver with DNS-SD or enter a fixed IPv4 address. Capture-only runs stop after five minutes; LAN runs stop after ten."
+            text = "Prepare permission-gated camera routes, then run the highest exact 30 fps mode shared by Camera2 and a hardware H.264 encoder. Find a local receiver with DNS-SD or enter a fixed IPv4 address. Capture-only runs stop after five minutes; LAN and USB runs stop after ten."
             textSize = 13f
             setTextColor(0xFF536164.toInt())
             setPadding(0, dp(4), 0, dp(8))
@@ -486,6 +502,29 @@ class MainActivity : Activity() {
             accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
         }
         panel.addView(phase4DiscoveryStatus, matchWrap())
+        usbMode = android.widget.CheckBox(this).apply {
+            text = "USB Network Mode (unchecked = LAN / Wi-Fi)"
+            setOnCheckedChangeListener { _, checked ->
+                if (checked) { stopReceiverDiscovery(); selectedDiscoveredReceiver = null }
+                usbStatus.text = if (checked) "Enable USB tethering manually. Refresh and confirm its local address; enter the Windows USB adapter IPv4 below." else "LAN / Wi-Fi selected."
+                renderPhase3()
+            }
+        }
+        panel.addView(usbMode, matchWrap())
+        usbAddresses = Spinner(this)
+        usbAddresses.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, listOf("Select USB local address"))
+        panel.addView(usbAddresses, matchWrap())
+        usbStatus = TextView(this).apply { text = "LAN / Wi-Fi selected."; textSize = 12f }
+        panel.addView(usbStatus, matchWrap())
+        usbPort = EditText(this).apply { hint = "USB media port"; setText("5004"); inputType = InputType.TYPE_CLASS_NUMBER; setSingleLine(true) }
+        panel.addView(usbPort, matchWrap())
+        panel.addView(actionButton("Refresh USB network addresses") {
+            try {
+                usbCandidates = com.camsure.profiler.phase4.UsbNetworkLink.candidates(this)
+                usbAddresses.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, listOf("Select USB local address") + usbCandidates.map { it.toString() })
+                usbStatus.text = if (usbCandidates.isEmpty()) "USB network not available. Enable USB tethering and connect the device to the PC." else "Confirm the tethering interface; candidates are not proof of USB. Select explicitly, even if only one."
+            } catch (error: Exception) { usbStatus.text = "Network inventory failed: " + error.javaClass.simpleName }
+        }, matchWrap())
         phase4ReceiverIp = EditText(this).apply {
             hint = "Optional fixed receiver IPv4 · blank = selected receiver or capture only"
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
@@ -498,7 +537,7 @@ class MainActivity : Activity() {
         preparePhase3Button = actionButton("Prepare camera routes") {
             requestCameraPermission(CameraAction.PREPARE_PHASE3)
         }
-        startPhase3Button = actionButton("Start highest direct mode · 5 min / LAN · 10 min") {
+        startPhase3Button = actionButton("Start highest direct mode · capture 5 min / stream 10 min") {
             startPhase3Experiment()
         }.apply { isEnabled = false }
         stopPhase3Button = actionButton("Stop camera run") {
@@ -558,6 +597,7 @@ class MainActivity : Activity() {
     }
 
     private fun toggleReceiverDiscovery() {
+        if (usbMode.isChecked) { usbStatus.text = "USB mode uses explicit PC address selection."; return }
         if (receiverDiscovery?.isRunning == true) {
             stopReceiverDiscovery()
             return
@@ -620,6 +660,9 @@ class MainActivity : Activity() {
         } else {
             "Find receivers on local network"
         }
+        usbPort.isEnabled = !active && usbMode.isChecked
+        usbMode.isEnabled = !active
+        usbAddresses.isEnabled = !active && usbMode.isChecked
         phase4ReceiverIp.isEnabled = !active
         preparePhase3Button.isEnabled = !active
         startPhase3Button.isEnabled = !active && selectedCameraRoute != null &&
@@ -684,10 +727,12 @@ class MainActivity : Activity() {
         snapshot.transport?.let { transport ->
             appendLine()
             appendLine("PHASE 4 · RTP/H.264 UDP")
+            appendLine("  Transport: " + transport.transportMode + " · link " + transport.linkState + " · local " + transport.localInterface + " / " + transport.localAddress + " · effective send buffer " + transport.effectiveSendBufferBytes)
             appendLine("  State: " + transport.state + " · receiver " + transport.destination +
                 " · payload type " + transport.payloadType + " · packetization mode " + transport.packetizationMode)
             appendLine("  SSRC: " + transport.ssrc + " · RTP clock " + transport.timestampClockHz + " Hz · datagram cap " + transport.rtpDatagramLimitBytes + " bytes")
-            appendLine("  Sent: " + transport.accessUnitsSent + " access units / " + transport.packetsSent + " packets · send errors " + transport.sendFailures)
+            appendLine("  Sent: " + transport.accessUnitsSent + " access units / " + transport.packetsSent + " packets · send errors " + transport.sendFailures + " · stale in-flight " + transport.inFlightStaleDrops)
+            appendLine("  Current sender: " + transport.currentSenderFps + " FPS · RTP bitrate " + transport.currentRtpBitrateBps + " bps (includes RTP headers)")
             appendLine("  Source PTS: origin " + (transport.timestampOriginPresentationTimeUs?.toString() ?: "pending") +
                 " µs · latest " + (transport.lastSentPresentationTimeUs?.toString() ?: "pending") + " µs")
             appendLine("  Sender queue: " + transport.queue.depth + " units / " + transport.queue.currentBytes + " bytes · high water " +
@@ -732,7 +777,7 @@ class MainActivity : Activity() {
 
     private fun runtimeReportFileName(): String {
         val stamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss"))
-        val prefix = if (phase3Snapshot.transport != null) "camsure-phase4-lan-" else "camsure-phase3-runtime-"
+        val prefix = if (phase3Snapshot.transport?.transportMode == "USB_NETWORK") "camsure-usb-network-" else if (phase3Snapshot.transport != null) "camsure-phase4-lan-" else "camsure-phase3-runtime-"
         return prefix + stamp + ".json"
     }
 

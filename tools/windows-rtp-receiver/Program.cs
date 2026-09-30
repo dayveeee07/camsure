@@ -7,6 +7,10 @@ internal static class Program
 {
     private static int Main(string[] args)
     {
+        if (args.SequenceEqual(new[] { "--list-adapters" })) {
+            foreach (var a in UsbNetworkSelection.Enumerate()) Console.WriteLine($"{a.AdapterId} | {a.AdapterName} | {a.Address}/{a.PrefixLength} (confirm USB adapter)");
+            return 0;
+        }
         if (args.SequenceEqual(new[] { "--self-test" })) return ReceiverSelfTest.Run();
         if (args.Length == 3 && args[0] == "--replay-test" && int.TryParse(args[2], out var testPort)) return ReplayTest.Run(args[1], testPort);
         if (!Options.TryParse(args, out var options, out var error))
@@ -16,17 +20,24 @@ internal static class Program
             return 2;
         }
 
+        UsbNetworkSelection? usb = null;
+        if (options.Usb) {
+            try { usb = UsbNetworkSelection.Select(UsbNetworkSelection.Enumerate(), options.AdapterId!, options.BindAddress, options.Peer!); }
+            catch (ArgumentException e) { Console.Error.WriteLine(e.Message); return 2; }
+        }
         using var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp)
         {
-            ReceiveBufferSize = 1024 * 1024,
-            ReceiveTimeout = 100
+            ReceiveBufferSize = options.Usb ? options.ReceiveBufferKiB * 1024 : 1024 * 1024,
+            ReceiveTimeout = options.Usb ? 0 : 100
         };
+        if (options.Usb) socket.SendBufferSize = 64 * 1024;
         socket.Bind(new IPEndPoint(options.BindAddress, options.Port));
         Console.WriteLine("CamSure Phase 4 RTP/H.264 counter receiver");
         Console.WriteLine($"Listening on {options.BindAddress}:{options.Port} (IPv4 UDP)");
-        Console.WriteLine($"Requested OS receive buffer: {socket.ReceiveBufferSize} bytes; application access-unit reassembly: 2 MiB / 500 ms");
+        Console.WriteLine($"Effective OS receive buffer: {socket.ReceiveBufferSize} bytes; application access-unit reassembly: 2 MiB / {(options.Usb ? 100 : 500)} ms");
         Console.WriteLine("Profile: RTP PT=96, H.264 packetization-mode=1, 90 kHz clock, RFC 8285 profile 0xBEDE");
-        using var discovery = StartDiscoveryAdvertisement(options.Port);
+        Console.WriteLine($"transport={(options.Usb ? "USB_NETWORK" : "LAN")}, adapter={usb?.AdapterName}, adapter-id={usb?.AdapterId}, local={socket.LocalEndPoint}, expected-peer={options.Peer}, effective-receive={socket.ReceiveBufferSize}, effective-send={socket.SendBufferSize}, epoch={DateTime.UtcNow.Ticks}");
+        using var discovery = options.Usb ? null : StartDiscoveryAdvertisement(options.Port);
         Console.WriteLine(options.PipeName is null ? "Counter-only mode; use --obs-pipe camsure-camera-1 for OBS." : $"Encoded AU bridge: {options.PipeName}");
 
         using var stop = new ManualResetEventSlim(false);
@@ -37,33 +48,66 @@ internal static class Program
         };
 
         using var bridge = options.PipeName is null ? null : new EncodedAuPipe(options.PipeName);
-        var receiver = new RtpH264Receiver(bridge);
+        var receiver = new RtpH264Receiver(bridge, options.Usb ? 100 : 500, options.Usb);
+        long rejectedPeers = 0;
         var packet = new byte[RtpH264Receiver.MaxDatagramBytes];
         EndPoint remote = new IPEndPoint(IPAddress.Any, 0);
         var clock = Stopwatch.StartNew();
         var previousReport = TimeSpan.Zero;
         var start = clock.Elapsed;
+        var linkLost = 0;
+        using var linkStop = new CancellationTokenSource();
+        var linkMonitor = usb is null ? Task.CompletedTask : Task.Run(async () =>
+        {
+            try {
+                while (!linkStop.IsCancellationRequested) {
+                    if (!usb.IsPresent()) {
+                        Interlocked.Exchange(ref linkLost, 1);
+                        socket.Close();
+                        return;
+                    }
+                    await Task.Delay(100, linkStop.Token);
+                }
+            } catch (OperationCanceledException) { }
+        });
+        using var telemetry = new LatestTelemetryWriter();
+        var receiveTiming = new ReceiveTimingStats();
 
         while (!stop.IsSet)
         {
             try
             {
                 remote = new IPEndPoint(IPAddress.Any, 0);
-                var length = socket.ReceiveFrom(packet, ref remote);
-                receiver.Process(packet, length, Stopwatch.GetTimestamp());
+                var receiveStarted = Stopwatch.GetTimestamp();
+                receiveTiming.BeforeReceive(receiveStarted);
+                // USB: wait for readiness without issuing a timed receive that must
+                // be cancelled between 30 FPS bursts. This socket has one reader.
+                if (!options.Usb || socket.Poll(25_000, SelectMode.SelectRead)) {
+                    var length = socket.ReceiveFrom(packet, ref remote);
+                    receiveTiming.Received(receiveStarted, Stopwatch.GetTimestamp(), length);
+                    if (options.Peer is not null && !UsbNetworkSelection.AcceptPeer(options.Peer, remote)) rejectedPeers++;
+                    else { if (options.Usb) receiver.ExpireStaleAccessUnit(Stopwatch.GetTimestamp()); receiver.Process(packet, length, Stopwatch.GetTimestamp()); }
+                } else receiveTiming.Idle();
             }
             catch (SocketException socketError) when (
                 socketError.SocketErrorCode == SocketError.TimedOut ||
                 socketError.SocketErrorCode == SocketError.WouldBlock)
             {
                 // Periodically expire an access unit whose marker packet was lost.
+                receiveTiming.Idle();
+            }
+            catch (ObjectDisposedException) when (options.Usb && Volatile.Read(ref linkLost) != 0) { break; }
+            catch (SocketException e) when (options.Usb) {
+                telemetry.Publish("USB socket failed; epoch terminated: " + e.SocketErrorCode);
+                Interlocked.Exchange(ref linkLost, 1); socket.Close(); break;
             }
 
             receiver.ExpireStaleAccessUnit(Stopwatch.GetTimestamp());
             if (clock.Elapsed - previousReport >= TimeSpan.FromSeconds(1))
             {
-                Console.WriteLine(receiver.FormatReport(clock.Elapsed - start));
-                if (bridge is not null) Console.WriteLine(bridge.Report());
+                telemetry.Publish($"telemetry-replaced={telemetry.Replaced}, rejected-peer={rejectedPeers} " + receiver.FormatReport(clock.Elapsed - start) +
+                    Environment.NewLine + receiveTiming.Report() +
+                    (bridge is null ? "" : Environment.NewLine + bridge.Report()));
                 previousReport = clock.Elapsed;
             }
 
@@ -71,10 +115,15 @@ internal static class Program
                 break;
         }
 
+        linkStop.Cancel();
+        linkMonitor.GetAwaiter().GetResult();
+        telemetry.Dispose();
+        if (Volatile.Read(ref linkLost) != 0) Console.Error.WriteLine("USB link/socket lost: epoch terminated; reselect and restart both endpoints.");
         Console.WriteLine("Final counters:");
-        Console.WriteLine(receiver.FormatReport(clock.Elapsed - start));
+        Console.WriteLine($"rejected-peer={rejectedPeers} " + receiver.FormatReport(clock.Elapsed - start));
+        Console.WriteLine(receiveTiming.Report());
                 if (bridge is not null) Console.WriteLine(bridge.Report());
-        return 0;
+        return Volatile.Read(ref linkLost) != 0 ? 3 : 0;
     }
 
     private static DnsSdReceiverAdvertisement? StartDiscoveryAdvertisement(int mediaPort)
@@ -94,7 +143,7 @@ internal static class Program
         }
     }
 
-    private sealed record Options(IPAddress BindAddress, int Port, int DurationSeconds, string? PipeName)
+    internal sealed record Options(IPAddress BindAddress, int Port, int DurationSeconds, string? PipeName, bool Usb = false, string? AdapterId = null, IPAddress? Peer = null, int ReceiveBufferKiB = 64)
     {
         public static bool TryParse(string[] args, out Options options, out string error)
         {
@@ -102,11 +151,20 @@ internal static class Program
             var port = 5004;
             var duration = 0;
             string? pipeName = null;
+            bool usbMode = false;
+            string? adapterId = null;
+            IPAddress? peer = null;
+            int? receiveBufferKiB = null;
             for (var index = 0; index < args.Length; index++)
             {
                 var value = index + 1 < args.Length ? args[index + 1] : null;
                 switch (args[index])
                 {
+                    case "--receive-buffer-kib" when value is not null && int.TryParse(value, out var bufferKiB) && bufferKiB is >= 64 and <= 256:
+                        receiveBufferKiB = bufferKiB; index++; break;
+                    case "--transport" when value is "usb" or "lan": usbMode = value == "usb"; index++; break;
+                    case "--adapter" when value is not null: adapterId = value; index++; break;
+                    case "--peer" when value is not null && IPAddress.TryParse(value, out var pa) && UsbNetworkSelection.Usable(pa): peer = pa; index++; break;
                     case "--obs-pipe" when value is not null:
                         pipeName = value; index++; break;
                     case "--bind" when value is not null && IPAddress.TryParse(value, out var address) && address.AddressFamily == AddressFamily.InterNetwork:
@@ -128,7 +186,10 @@ internal static class Program
                 }
             }
 
-            options = new Options(bind, port, duration, pipeName);
+            options = new Options(bind, port, duration, pipeName, usbMode, adapterId, peer, receiveBufferKiB ?? 64);
+            if (!usbMode && receiveBufferKiB is not null) { error = "--receive-buffer-kib requires --transport usb (64 to 256 KiB)."; return false; }
+            if (usbMode && (adapterId is null || peer is null || !UsbNetworkSelection.Usable(bind))) { error = "USB requires --adapter ID --bind LOCAL_IPV4 --peer ANDROID_IPV4; use --list-adapters."; return false; }
+            if (!usbMode && (adapterId is not null || peer is not null)) { error = "--adapter/--peer require --transport usb."; return false; }
             error = string.Empty;
             return true;
         }
@@ -140,7 +201,7 @@ internal sealed class RtpH264Receiver
     public const int MaxDatagramBytes = 65_507;
     private const int MaxAcceptedDatagramBytes = 1_200;
     private const int MaxAccessUnitBytes = 2 * 1024 * 1024;
-    private const int MaxAccessUnitAgeMs = 500;
+    private readonly int MaxAccessUnitAgeMs;
     private const int PayloadType = 96;
     private const int H264ClockHz = 90_000;
     private const int ExtensionProfileOneByte = 0xbede;
@@ -155,8 +216,14 @@ internal sealed class RtpH264Receiver
     private readonly IEncodedVideoSink? _sink;
     private bool _discontinuity = true;
     private ulong _session = 1;
+    private readonly bool _usbEpoch;
+    private readonly HashSet<uint> _retiredStreams = [];
+    private long _retiredPackets;
     private byte[] _sps = [], _pps = [];
-    public RtpH264Receiver(IEncodedVideoSink? sink = null) { _sink = sink; }
+    public RtpH264Receiver(IEncodedVideoSink? sink = null, int maxAccessUnitAgeMs = 500, bool usbEpoch = false) {
+        _sink = sink; MaxAccessUnitAgeMs = maxAccessUnitAgeMs; _usbEpoch = usbEpoch;
+        if (usbEpoch) _session = (ulong)DateTime.UtcNow.Ticks;
+    }
     private byte[] _buffer = new byte[MaxAccessUnitBytes];
     private long _datagrams;
     private long _validRtpPackets;
@@ -227,7 +294,14 @@ internal sealed class RtpH264Receiver
         var sequence = BinaryPrimitives.ReadUInt16BigEndian(packet.AsSpan(2, 2));
         var rtpTimestamp = BinaryPrimitives.ReadUInt32BigEndian(packet.AsSpan(4, 4));
         var ssrc = BinaryPrimitives.ReadUInt32BigEndian(packet.AsSpan(8, 4));
-        if (_ssrc is not null && _ssrc != ssrc) StartNewStream();
+        if (_usbEpoch && _retiredStreams.Contains(ssrc)) { _retiredPackets++; return; }
+        if (_ssrc is not null && _ssrc != ssrc) {
+            if (_usbEpoch) {
+                if (_retiredStreams.Count >= 64) throw new InvalidOperationException("USB epoch restart limit reached; restart receiver.");
+                _retiredStreams.Add(_ssrc.Value);
+            }
+            StartNewStream();
+        }
         _ssrc = ssrc;
 
         var headerLength = 12 + (packet[0] & 0x0f) * 4;
@@ -345,7 +419,7 @@ internal sealed class RtpH264Receiver
         $"gaps={_packetGaps}, out-of-order={_outOfOrderPackets}, bad-packets={_malformedPackets}, oversized-datagrams={_oversizedDatagrams}, unsupported={_unsupportedPayloads} | " +
         $"PTS-map-mismatch={_timestampMapMismatches}, nonmonotonic-PTS={_nonMonotonicSourcePts}, key-flag-mismatch={_keyframeFlagMismatches} | " +
         $"config-AUs={_accessUnitsWithCodecConfig}, AUs-without-SPS/PPS={_accessUnitsMissingSpsPps} | " +
-        $"reassembly-depth={(_accessUnitActive ? 1 : 0)}/1, bytes={_accessUnitLength}/{MaxAccessUnitBytes}, age={CurrentAccessUnitAgeMs()} ms/{MaxAccessUnitAgeMs} ms, " +
+        $"session={_session}, stale-epoch-packets={_retiredPackets}, stale-AUs={_staleAccessUnits}, oversized-AUs={_oversizedAccessUnits}, reassembly-depth={(_accessUnitActive ? 1 : 0)}/1, bytes={_accessUnitLength}/{MaxAccessUnitBytes}, age={CurrentAccessUnitAgeMs()} ms/{MaxAccessUnitAgeMs} ms, " +
         $"high-water={_highWaterAccessUnitBytes} bytes/{_highWaterAccessUnitAgeMs} ms | " +
         $"SSRC={_ssrc?.ToString() ?? "waiting"}, restarts={_streamRestarts}";
 

@@ -94,3 +94,8 @@ Whenever an implementation changes an architectural assumption:
 4. Add or update the relevant test in `TESTING.md`.
 
 Do not let implementation become the only source of truth.
+
+## USB Network Mode (2026-09-30)
+
+Implemented/host-tested using Android USB tethering; physical acceptance pending.
+See [completion report](USB_NETWORK_REPORT.md) and [operator acceptance guide](USB_NETWORK_TESTING.md).

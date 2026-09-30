@@ -801,3 +801,12 @@ while connecting/reading a partial header. It owns/cleans only its own processes
 Run the existing diagnostic lifecycle probe separately as in the plugin README.
 The three successful 2026-09-30 logs under evidence are synthetic/host evidence;
 the physical baseline evidence above is recorded separately.
+
+# 20. USB Network Mode Qualification
+
+**2026-09-30:** Implemented and host-tested; physical USB acceptance NOT RUN.
+User chose to test later. Follow [operator setup and A-H acceptance checklist](USB_NETWORK_TESTING.md).
+[Completion report](USB_NETWORK_REPORT.md) separates current build/simulated
+results from route capture, real image, 600 s soak, glass-to-glass samples, ten
+cable cycles, consumer stall, OBS frontend lifecycle and post-USB LAN regression.
+None of the older LAN or third-party tethering evidence closes this gate.

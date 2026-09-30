@@ -156,3 +156,14 @@ performance is tested in this phase. The Phase 2 metadata comparison gate passed
 on 2026-09-27 using user-supplied Samsung SM-X115 and Xiaomi 2406APNFAG reports
 (both API 36); see `docs/PROGRESS.md`. Runtime camera/encoder compatibility and
 API-version differences remain untested.
+
+## USB Network Mode
+
+Check USB Network Mode (LAN remains the unchecked default). Manually enable USB
+tethering in Settings, refresh candidate local addresses, explicitly select the
+tethering address, enter the Windows USB adapter IPv4 and matching media port.
+Prepare/start the existing camera run. No root, ADB or USB debugging is required
+for operation. Export final JSON before the next run. Link loss stops the run;
+refresh/reselect and restart both endpoints after recovery. Candidate enumeration
+is not physical route proof. See ../../docs/USB_NETWORK_TESTING.md for setup and
+acceptance; this is RTP over USB tethering, not native USB bulk/UVC/AOA.
