@@ -286,7 +286,8 @@ internal class BoundedAccessUnitQueue(
     private val maxQueuedBytes: Int = 512 * 1024,
     private val maxQueueAgeMs: Long = 500,
     private val maxQueuedUnits: Int = 24,
-    private val nowNanos: () -> Long = SystemClock::elapsedRealtimeNanos
+    private val nowNanos: () -> Long = SystemClock::elapsedRealtimeNanos,
+    private val maxAccessUnitBytes: Int = maxQueuedBytes
 ) {
     private data class Queued(val payload: EncodedAccessUnit, val queuedAtNs: Long)
 
@@ -315,7 +316,7 @@ internal class BoundedAccessUnitQueue(
                 payload.close()
                 return
             }
-            if (payload.size > maxQueuedBytes) {
+            if (payload.size > maxAccessUnitBytes || payload.size > maxQueuedBytes) {
                 oversizedDrops++
                 flushLocked { overflowDrops++ }
                 awaitingKeyFrame = true

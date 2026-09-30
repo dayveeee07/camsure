@@ -68,6 +68,8 @@ static void test(uint32_t width, uint32_t height, const char *fixture)
   require(frame.presentation_time_us > previous, "Output PTS ordering");
   if ((frame.presentation_time_us - 1'000'000) % 33'333 != 0) throw std::runtime_error("Exact source PTS output=" + std::to_string(frame.presentation_time_us));
   require(frame.pixels[width * 10 + 10] >= 70 && frame.pixels[width * 10 + 10] <= 95, "Decoded luma");
+  require(frame.pixels[size_t(width) * height + 10] >= 82 && frame.pixels[size_t(width) * height + 10] <= 98, "Decoded U chroma");
+  require(frame.pixels[size_t(width) * height * 5 / 4 + 10] >= 172 && frame.pixels[size_t(width) * height * 5 / 4 + 10] <= 188, "Decoded V chroma");
   previous = frame.presentation_time_us; ++decoded;
  };
  auto drain = [&] {
@@ -96,7 +98,8 @@ static void test(uint32_t width, uint32_t height, const char *fixture)
   const DWORD size = width * height * 3 / 2;
   check(MFCreateSample(&sample)); check(MFCreateMemoryBuffer(size, &buffer));
   BYTE *bytes = nullptr; check(buffer->Lock(&bytes, nullptr, nullptr));
-  std::memset(bytes, 81, size_t(width) * height); std::memset(bytes + size_t(width) * height, 128, size_t(width) * height / 2);
+  std::memset(bytes, 81, size_t(width) * height);
+  for (size_t offset = size_t(width) * height; offset < size; offset += 2) { bytes[offset] = 90; bytes[offset + 1] = 180; }
   check(buffer->Unlock()); check(buffer->SetCurrentLength(size)); check(sample->AddBuffer(buffer.Get()));
   check(sample->SetSampleTime(10'000'000 + int64_t(index) * 333'330)); check(sample->SetSampleDuration(333'330));
   HRESULT hr = encoder->ProcessInput(0, sample.Get(), 0);
@@ -123,13 +126,13 @@ static void test(uint32_t width, uint32_t height, const char *fixture)
    file.write(reinterpret_cast<const char *>(unit.annex_b.data()), static_cast<std::streamsize>(unit.annex_b.size()));
   }
  }
- std::printf("PASS: %ux%u encoded=%zu decoded=%zu including reset/replay, owned I420 and exact ordered PTS\n", width, height, units.size(), decoded);
+ std::printf("PASS: %ux%u backend=%s encoded=%zu decoded=%zu including reset/replay, owned I420 and exact ordered PTS\n", width, height, decoder->backend(), units.size(), decoded);
 }
 int main(int argc, char **argv)
 {
  check(CoInitializeEx(nullptr, COINIT_MULTITHREADED)); check(MFStartup(MF_VERSION));
  int result = 0;
- try { test(1280, 720, nullptr); test(1920, 1080, argc > 1 ? argv[1] : nullptr); }
+ try { test(1280, 720, nullptr); test(1920, 1080, argc > 1 ? argv[1] : nullptr); test(3840, 2160, argc > 2 ? argv[2] : nullptr); }
  catch (const std::exception &error) { std::fprintf(stderr, "FAIL: %s\n", error.what()); result = 1; }
  MFShutdown(); CoUninitialize(); return result;
 }

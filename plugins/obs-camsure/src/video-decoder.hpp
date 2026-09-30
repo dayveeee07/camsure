@@ -26,10 +26,18 @@ struct DecodedVideoFrame {
 // All calls and destruction belong to the session decoder thread.
 class VideoDecoder {
 public:
+ struct Timing {
+  uint64_t transfer_count = 0, conversion_count = 0, codec_count = 0;
+  double transfer_total_ms = 0, transfer_max_ms = 0;
+  double conversion_total_ms = 0, conversion_max_ms = 0;
+  double codec_total_ms = 0, codec_max_ms = 0;
+ };
  using Output = std::function<void(DecodedVideoFrame)>;
  virtual ~VideoDecoder() = default;
  virtual void submit(const EncodedVideoAccessUnit &, const Output &) = 0;
  virtual void reset() = 0;
+ virtual const char *backend() const { return "software"; }
+ virtual Timing timing() const { return {}; }
 };
 std::unique_ptr<VideoDecoder> make_h264_decoder();
 }

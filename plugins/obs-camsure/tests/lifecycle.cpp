@@ -90,7 +90,8 @@ int main(int argc, char **argv)
 		obs_module_t *module = nullptr;
 		require(obs_open_module(&module, argv[1], argv[2]) == MODULE_SUCCESS, "Plugin load failed");
 		require(obs_init_module(module), "Plugin initialization failed");
-        if (argc == 4 && std::string(argv[3]) == "--video") {
+        if (argc == 4 && (std::string(argv[3]) == "--video" || std::string(argv[3]) == "--video-4k")) {
+            const bool uhd = std::string(argv[3]) == "--video-4k";
             auto *settings = obs_data_create();
             obs_data_set_bool(settings, "live_video", true);
             obs_data_set_string(settings, "au_pipe", "camsure-test-video");
@@ -106,7 +107,7 @@ int main(int argc, char **argv)
                 auto *frame = obs_source_get_frame(sources[0]);
                 if (frame) {
                     if (empty_after_video) resumed = true;
-                    require(frame->format == VIDEO_FORMAT_I420 && frame->width == 1920 && frame->height == 1080, "Decoded OBS dimensions/format");
+                    require(frame->format == VIDEO_FORMAT_I420 && frame->width == (uhd ? 3840u : 1920u) && frame->height == (uhd ? 2160u : 1080u), "Decoded OBS dimensions/format");
                     require(frame->data[0][frame->linesize[0] * 10 + 10] >= 70 && frame->data[0][frame->linesize[0] * 10 + 10] <= 95, "Decoded OBS luma");
                     if (frame->timestamp != last_pts) { last_pts = frame->timestamp; ++frames; }
                     obs_source_release_frame(sources[0], frame);

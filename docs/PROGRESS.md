@@ -2,6 +2,329 @@
 
 This file tracks verified implementation status.
 
+## 2026-10-01: Xiaomi wireless band comparison checkpoint
+
+User identifies phase4-lan-20261001-072330 as 5 GHz and 072503 as 2.4 GHz.
+Both actually encode 1920x1080 at approximately 30 FPS with zero capture
+failures, estimated frame drops or sender queue/send failures. The 5 GHz run
+lasts 318.717 s, sends all 9557 frames at 7.895 Mbps, and is user-observed
+smooth in OBS. The 2.4 GHz run lasts 57.763 s, sends all 1725 frames at
+8.098 Mbps, but the user observes OBS drops. No matching receiver counters
+were supplied, so network loss versus downstream timing is unresolved.
+The 2.4 GHz 720p follow-up, phase4-lan-20261001-073121, lasts 47.996 s:
+actual 1280x720 at 30.008 FPS, 3.608 Mbps, all 1432 frames sent and zero
+capture/encoder estimates, queue drops or send failures. User says it seems
+fine in OBS. This is short single-device visual evidence, not multi-phone
+or service-duration qualification. Current operator preference is 1080p
+USB/5 GHz and 720p on this 2.4 GHz setup; defaults remain unchanged.
+Next proposed slice: preview-first UI/settings and simpler connection setup.
+That UI and continuous service mode have not been implemented in this checkpoint.
+
+## 2026-10-01: Xiaomi 1080p USB ten-minute sender/receiver baseline
+
+Report camsure-usb-network-20261001-071629.json completed 600.1087 s,
+SSRC 467604331. Actual output 1920×1080/full crop, approximately 30.006 FPS,
+17999 encoded/sent AUs and 517565 packets. Receiver totals match exactly:
+17999 complete AUs and 517565 packets, zero incomplete/sequence gaps,
+stale/oversized AUs or PTS-map mismatches, no SSRC restart. Phone zero capture
+failures/estimated frame drops, queue/oversized/stale/recovery drops and send
+failures. Bridge 17969 written/29 dropped/one connection-error, including
+startup; presentation replacements previously recorded remain a separate
+nonzero counter. User earlier reports smooth five-minute movement testing;
+full-run visible-result confirmation is separate from matched transport proof.
+Last sampled ISO 269 and exposure ~9.997 ms, not a full exposure history.
+USB baseline is now demonstrated for this Xiaomi/PC at 1080p for ten minutes.
+Separate 1080p LAN run, other phones, long service/battery and visual quality
+qualification remain open. Metadata rejection does not invalidate this
+specific runtime proof or justify unconditional overrides on other devices.
+
+## 2026-10-01: Early real 1080p USB/OBS movement result
+
+User reports five minutes without visible drops. Current saved receiver log
+at t=4:13, SSRC 467604331: 215346 packets, 7483 complete AUs, zero sequence
+gaps/incomplete/stale/oversized AUs, bridge written 7453, drops 29 (startup
+recovery included), one connection/error, max bridge age 18 ms. OBS
+2026-10-01 07-04-10.txt at 07:10:34 confirms 1920×1080, 7465 inputs/decoded,
+zero AU drops/stale frames/decode errors, 1110 decoded-frame replacements,
+three cumulative resets. Replacements mean not every decoded frame is
+presented; the user's no-stutter observation is distinct from zero drops
+at all stages. Cumulative FPS includes pre-stream idle. Full ten-minute
+sender/receiver correlation and separate LAN qualification remain pending.
+
+## 2026-10-01: Xiaomi exact 1080p runtime proof despite metadata rejection
+
+Report camsure-phase3-runtime-20261001-070257.json completed 300.173 s.
+Rear logical route 0 and c2.mtk.avc.encoder configure/capture session succeed.
+Actual output 1920×1080 with full crop 0,0–1919,1079, without padding/scaling.
+8985 encoded frames, approximately 29.993 FPS, 7.868 Mbps measured, zero
+capture failures and five timestamp-gap-based estimated capture/encode drops.
+This contradicts any claim that advertised 16×16 alignment makes runtime
+1080p impossible on this device. exactDirect1080pSupported=false is still the
+metadata result, not the runtime verdict. Do not generalize bypass to all
+devices or mark wired/wireless delivery qualified by this capture-only run.
+Last sampled ISO 4291, exposure 29.992032 ms; grain needs separate qualification.
+Next: same explicit 1080p trial over USB/OBS, then LAN independently. Retain
+720p default until delivery/visible quality pass; no permanent capability
+override for other phones is established.
+
+## 2026-10-01: Explicit exact-1080p configuration trial
+
+User authorized investigating smooth 1080p after continued 4K performance
+failures. Added opt-in exact 1920×1080@30 configuration trial, restricted to
+camera-advertised MediaCodec output size/FPS and hardware H.264 encoders.
+This trial permits attempting actual encoder configuration despite a false
+areSizeAndRateSupported result. Exact encoder metadata support remains false
+in plan/runtime reporting; actual configuration/session/output fields establish
+runtime results independently. No padding/scaling/crop workaround implemented.
+Trial overrides high-resolution selection, never silently falls back to 720p,
+and is disabled during active runs. Existing defaults remain unchanged.
+The trial does not guarantee configure success or smooth 1080p. If rejected,
+preserve error JSON and investigate a correctly specified aligned/GPU path.
+Physical check: install APK, prepare rear route, check 1080p configuration
+trial, first short capture-only run and export JSON. If successful with actual
+visible 1920×1080, qualify the same mode over USB/OBS.
+
+## 2026-10-01: Paired 4K/720p sender and exposure reports
+
+4K report camsure-usb-network-20261001-061218.json, SSRC 4171557510:
+112.064 s, 3353 encoded/sent AUs, 30.005 FPS, 37.721 Mbps; last sampled
+ISO 1263, exposure 19.994688 ms, noise/edge modes FAST/FAST (1/1).
+720p report camsure-usb-network-20261001-061607.json, SSRC 808088820:
+84.181 s, 2517 encoded/sent AUs, 30.004 FPS, 3.619 Mbps; last sampled
+ISO 932, exposure 9.997344 ms, noise/edge modes FAST/FAST (1/1).
+Both route 0, zero oversized/overflow/waiting/stale/in-flight sender drops.
+
+This confirms sender starvation is resolved in these runs. Exposure differs,
+so the comparison does not isolate resolution or denoising: both use FAST,
+but identical mode names do not guarantee identical OEM processing. Single
+last-sampled values cannot establish exposure throughout the runs. User
+observes clean/smooth 720p versus noisy/stuttering 4K; retain both observations.
+Next noise investigation requires exposure history and controlled same scene
+comparison (including optional stock-camera reference), without forcing an
+ISO reduction that could underexpose. Performance investigation remains
+GPU readback/presentation audit; no smooth 4K acceptance.
+
+## 2026-10-01: Real stage-timing comparison — 4K still fails, 720p smooth
+
+User reports frequent drops and grain at 4K, then cleaner video with no visible
+drops after selecting lower resolution. OBS log 2026-10-01 06-09-09.txt confirms
+the lower mode is 1280×720/software. By 06:13:12 AU drops/resets remain
+unchanged at 1790/77 while decoded/submitted frames advance.
+4K GPU-transfer cumulative average is 21.464 ms and maximum 92.284 ms.
+Max codec API call is 71.273 ms; max submit-to-decoded 101.66 ms and AU age
+165.55 ms. Maxima across operations are not additive and include scheduling;
+transfer includes waiting for GPU completion. Switching to software 720p
+does not reset these historical maxima. Transfer/readback is a measured
+significant contributor; direct GPU/native NV12 presentation needs an audit
+before another architecture change. Grain cause remains unconfirmed pending
+paired scene/exposure reports. Preserve 720p as the qualified fallback; no
+smooth or clean 4K qualification established by this trial.
+
+## 2026-10-01: 4K stage timings and D3D11 device reuse trial
+
+Added decoder-thread cumulative count/average/maximum measurements for GPU
+frame transfer, packed pixel allocation/copy/NV12-to-I420 conversion, and
+individual FFmpeg send/receive calls. OBS logs them once per second alongside
+existing AU age/presentation/bridge timings. GPU transfer includes waiting
+for GPU completion; codec-call average is per API call, not per frame. These
+measurements cannot be equated to end-to-end latency or device-only work.
+
+Inspection showed decoder resets recreate D3D11 devices. One device reference
+is now retained per decoder session across codec resets, released on decoder
+destruction or selected hardware failure. Codec/frame pools are still freed
+at reset, and software fallback, source independence and queue limits remain.
+This removes repeated device creation but is not a demonstrated lag fix.
+
+Native build, hardware/software decoder tests at 720p/1080p/4K, and the UHD
+RTP/native OBS lifecycle probe pass. First instrumented synthetic run: transfer
+average 9.716 ms, pixel conversion 5.051 ms, codec-call maximum 76.818 ms.
+Device-reuse run: transfer average 15.656 ms (max 35.999), conversion 4.850 ms,
+codec-call max 59.353 ms, 102 distinct frames presented. Runs are uncontrolled;
+different results do not establish improved sustained throughput. Physical
+4K correlation remains required. Camera image-processing requests unchanged.
+Next: short real 4K run for stage timing, then matched same-subject 720p/4K
+runtime JSONs for exposure/noise comparison; preserve lighting/framing and
+capture original scene rather than a monitor feedback loop.
+
+## 2026-10-01: Real hardware-decoded 4K trial — improved, still unqualified
+
+Report camsure-usb-network-20261001-060204.json, SSRC 361553449, 101.145 s.
+3026 encoded and sent AUs, 410596 packets; receiver matches both totals exactly,
+zero gaps/incomplete AUs and zero sender drops/failures. OBS confirms D3D11VA
+and 3840×2160. Receiver bridge written=2889, dropped=136, max depth four,
+age 111 ms, reconstruction-to-write 151.384 ms. OBS cumulative at 06:02:01:
+2880 input, 2740 decoded, 141 AU drops, 353 replaced frames, 30 resets,
+zero decode errors; max decode 101.25 ms. These maxima/cumulative counters
+do not establish average end-to-end FPS or latency.
+
+User still sees drops and grain even in a well-lit area, and observes cleaner
+720p. Last sampled camera ISO 483, exposure 9997344 ns (~10 ms), noise
+reduction FAST (1), edge FAST (1). These are one sampled capture result,
+not complete exposure history. Noise reduction is not disabled. Grain cause
+remains unconfirmed; stock-processing differences and noise visibility at
+different resolutions must not be presented as proved. Next investigate
+GPU-to-CPU transfer/I420 conversion/pipe backpressure timing, and controlled
+same-scene 720p/4K exposure/processing comparisons before changing denoise.
+
+## 2026-10-01: 4K hardware-decode and camera-processing diagnostics
+
+Explicitly authorized following decoder-bound 4K trial. Shared FFmpeg decoder
+prefers D3D11VA for dimensions above 1080p when offered by the decoder/device;
+smaller modes retain software decoding. Hardware initialization failure
+selects software; a failure after hardware selection disables hardware for
+that decoder session, resets it and recovers in software at a subsequent
+keyframe. This is not a seamless same-frame retry. Optional process environment
+CAMSURE_FORCE_SOFTWARE bypasses hardware for diagnostic testing.
+GPU frames are transferred to CPU NV12 and converted into the existing owned
+I420 frame; this is not zero-copy. Dimensions/max_pixels, one latest decoded
+slot, AU/queue bounds and 100 ms freshness policies are retained. OBS records
+the selected backend per source when it changes.
+
+Native build passed. 720p/1080p software and 4K D3D11VA decoder tests passed,
+including exact PTS, reset/replay, distinct U/V samples and owned I420. Forced
+software tests passed at all sizes, including the final distinct-chroma update.
+The final colored 4K native OBS/GPU integration passed with 132 distinct frames,
+loss/restart/clear-output, idle/partial teardown x10 and shutdown. Synthetic
+tests do not establish real-scene 4K30 throughput or latency. Runtime GPU
+failure and unavailable-device paths still need qualification.
+
+Android now exports latest sampled capture-result ISO, exposure time, noise
+reduction mode and edge mode (sampled every 30 frames, null if unreported).
+Capture/processing requests are unchanged. Android build, six unit tests and
+lint passed. Next: install plugin with OBS fully exited, install APK and run
+real 4K USB against a well-lit subject, exporting sender JSON and correlated
+receiver/OBS logs. Hardware throughput and grain diagnosis remain pending.
+
+Installed after the user exited OBS; installed/staged DLL hashes match:
+BC238199C1C4E5E3AE1A7559EC6118EE58787E5203E69F52597092943FFD2096.
+Previous DLL retained at build_vs2026/pre-hardware-20261001-055748.dll.
+APK SHA256: EF87B46C7CD3F3373D4D38B9698C9AFF93044D7F37F6F36B3748107E7E6F8142.
+
+## 2026-10-01: Resolution-aware sender size/pacing correction
+
+Following SSRC 577859424 sender starvation, user authorized the next fix.
+For selected dimensions above 1920×1080, SenderPolicy now permits a 2 MiB
+individual compressed AU and 4 MiB total queued bytes. Smaller modes retain
+512 KiB individual/total bounds. USB retains four queued AUs and 100 ms age;
+LAN retains 24 AUs/500 ms. USB higher-resolution pacing uses 32 datagrams
+per minimum 1 ms batch interval versus eight for baseline modes. No idle
+credit accumulates. Larger total bytes do not relax stale-frame deadlines.
+The compressed assembly/receiver/decoder AU cap remains 2 MiB. Codec config
+and Annex B reconstruction can add bytes; receiver oversize telemetry remains
+required at the cap boundary. Throughput and packet-loss improvement need
+physical proof. Native decoder is unchanged in this step and remains a known
+performance constraint.
+
+Added tests for accepting 768 KiB keyframes and dependent frames, rejecting
+over-2-MiB AUs/recovery gating, 100 ms expiry, baseline policy preservation,
+and 32-packet pacing. Next physical trial: same OBS plugin/readiness receiver
+and 256 KiB buffer, latest APK/high-resolution USB, short movement run and
+fresh JSON. Compare encoded/sent counts and oversized/waiting-keyframe drops
+before assessing decoder throughput. Do not call smooth 4K fixed on build proof.
+
+## 2026-10-01: Matched 4K sender report reveals size-limit starvation
+
+Report camsure-usb-network-20261001-054405.json, SSRC 577859424, 94.1955 s.
+Phone encodes 2817 AUs at approximately 30.0045 FPS, measured 37.5137 Mbps,
+zero estimated capture/encode drops or capture failures. Only 300 AUs and
+38951 packets are sent: senderQueue droppedOversized=84 and
+droppedWhileWaitingForKeyFrame=2433 (300+84+2433=2817). Queue byte cap
+524288, high-water bytes 511650; no overflow/stale/in-flight drops or send
+failures. Temperature 41.7→42.8 C, thermal none.
+
+This corrects the prior incomplete diagnosis: the sender cap rejects large
+4K AUs, causing sustained keyframe-recovery starvation, in addition to
+measured decoder lag. Zero receiver packet gaps apply only to packets sent.
+Receiver log contains another prior SSRC and currently ends mid-run, so
+cumulative receiver totals cannot be equated with this completed sender run.
+Next bounded fix must address per-AU/total-byte limits and 4K packet pacing
+together, with separate retained 720p defaults and the 100 ms freshness bound;
+then qualify decoder throughput. Do not infer which exact oversized frames
+were keyframes without per-AU evidence, or declare GPU decoding the sole fix.
+
+## 2026-10-01: First real 4K USB/OBS trial — video present, performance failed
+
+User reports severe lag. usb-4k-receiver.log at t=1:27 reports zero RTP gaps
+and incomplete AUs; largest reconstructed AU 511535 bytes, age high-water
+76 ms. Bridge has repeated drops/errors and reaches approximately 103.5 ms
+reconstruction-to-write. Current OBS log 2026-10-01 05-37-11.txt confirms
+3840×2160 decoded output. Around 05:42:52 it reports 93 input, 42 decoded,
+51 AU drops, 10 resets, maximum submit-to-decoded 76.55 ms, AU age 105.11 ms.
+Prior session max decode was 71.31 ms, with frames rejected after 100 ms.
+These maxima do not represent average FPS; cumulative FPS includes idle time.
+
+4K delivery and native display are demonstrated but smooth 4K30 is not.
+Synthetic flat-image coverage did not establish real-scene decoding throughput.
+Do not loosen freshness deadlines to hide backlog. Next investigate decoder
+throughput (including hardware decode on the target PC) and USB keyframe
+pacing/residence. A matching fresh phone JSON is needed to assess sender
+queue drops/stale sends in this run. Retain accepted 720p service baseline.
+
+## 2026-10-01: Shared 4K decode/native OBS trial — host passed
+
+Explicitly authorized following Xiaomi 4K capture proof. Shared H.264 decoder
+now accepts even 8-bit I420 dimensions through 3840×2160, with FFmpeg
+max_pixels=3840×2160 guarding decoder allocation. One packed I420 4K frame
+is 12441600 bytes; latest decoded-frame slot remains one, with bounded
+in-flight decode/presentation ownership. Existing AU bounds (2 MiB), bridge
+queue (4 AUs/4 MiB/100 ms), and freshness policies remain unchanged.
+Removed temporary Android capture-only restriction; high-resolution mode
+remains opt-in. Default selection and USB pacing/readiness remain unchanged.
+
+Native build passed. Synthetic encoder/decoder tests pass at 720p, 1080p and
+3840×2160, 35 encoded/70 decoded per size including reset/replay and exact
+PTS. UHD and existing 1080p RTP-to-AU-pipe-to-OBS-I420/GPU probes each pass
+with 136 distinct frames, induced loss, stop/clear/restart, idle/partial-read
+removal x10 and shutdown. Fixtures are synthetic and low-complexity; this
+does not qualify real phone bitrate, 4K30 throughput or end-to-end latency.
+Android assembleDebug, unit tests and lint pass. Staged package installed
+into the existing CamSure plugin directory while OBS was closed; prior DLL
+saved at plugins/obs-camsure/build_vs2026/usb-baseline-backup/obs-camsure.dll.
+Next: install latest APK, reopen OBS, use high-resolution trial with existing
+USB readiness receiver and 256 KiB buffer, run a short movement test, export
+runtime JSON and correlate the new receiver/OBS logs. Physical 4K pending.
+
+## 2026-10-01: Xiaomi 14T 4K30 capture/encode proof
+
+Supplied capability report camsure-capabilities-20261001-052951.json and runtime
+report camsure-phase3-runtime-20261001-053120.json. Rear logical route 0,
+3840×2160@30, c2.mtk.avc.encoder hardware H.264 configured successfully and
+Camera2 capture session configured. Actual encoder output is 3840×2160 with
+full visible crop 0,0–3839,2159. Run stopped after 15.7167 s, 455 encoded
+frames, approximately 30.0276 FPS, zero estimated capture/encode drops and
+capture failures. Requested VBR 32 Mbps, measured average 36.6603 Mbps.
+Thermal status none; battery temperature 41.2 C at start/end.
+
+Direct exact 1080p remains rejected by the reported 16×16 encoder alignment;
+2160 is divisible by 16 and exact 4K30 is advertised and now demonstrated.
+This proves short-run 4K Camera2/hardware encode access, not stock-camera
+processing parity, sustained 4K, transport, decode or OBS display. Native
+decoder still limits frames to 1080p. Next bounded slice: audit and extend
+shared decoder frame bounds/buffering for 4K with synthetic coverage, then
+explicitly qualify USB delivery at the measured bitrate; retain 720p fallback.
+
+## 2026-10-01: Higher-resolution capability and capture trial
+
+User explicitly authorized investigating Xiaomi 14T 1080p/4K. Audit found
+two software limits: CameraEncoderExperimentDiscovery excluded sizes above
+1920×1080 before encoder checks, and native video-decoder.cpp rejects decoded
+dimensions above 1920×1080. The first does not establish phone incapability.
+Added an opt-in high-resolution checkbox, expanding exact Camera2 + hardware
+H.264 size/FPS planning through 3840×2160@30. Existing selection stays default.
+Trial notes report camera output advertisement/minimum duration and each
+hardware encoder's exact 1080p/4K30 support/alignment. Capability scan additionally
+checks 4K30/60. The existing runtime experiment verifies session configuration
+and actual encoder output dimensions. High-resolution streaming into the
+existing OBS decoder is blocked with capture-only instructions.
+
+Validation: Android assembleDebug, testDebugUnitTest and lintDebug pass.
+No phone or 4K OBS result yet. This diagnostic does not implement a padded
+1080p path, HEVC, HDR, or extend native decode. Next: user installs APK, scans
+capabilities, prepares rear camera, enables high-resolution trial, examines
+eligible modes and runs capture-only with USB unchecked/no receiver selected.
+Export both capability and runtime JSON; if 4K is not eligible, report notes
+and capture-only selected dimensions instead of claiming a 4K test.
+
 ## 2026-10-01: Xiaomi USB readiness trial — ten-minute video baseline passed
 
 User confirms no visible drops for the completed 600.1009-second run in

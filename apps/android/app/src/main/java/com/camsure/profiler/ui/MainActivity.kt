@@ -52,6 +52,8 @@ class MainActivity : Activity() {
     private lateinit var reportText: TextView
     private lateinit var content: LinearLayout
     private lateinit var phase3Routes: Spinner
+    private lateinit var highResolutionTrial: android.widget.CheckBox
+    private lateinit var exact1080Trial: android.widget.CheckBox
     private lateinit var phase4DiscoveredReceivers: Spinner
     private lateinit var phase4ReceiverIp: EditText
     private lateinit var phase4DiscoveryButton: Button
@@ -294,7 +296,10 @@ class MainActivity : Activity() {
             return
         }
         try {
-            directModePlans = CameraEncoderExperimentDiscovery.discoverDirectModes(this, route)
+            directModePlans = CameraEncoderExperimentDiscovery.discoverDirectModes(this, route,
+                include4k = highResolutionTrial.isChecked && !exact1080Trial.isChecked,
+                trial1080 = exact1080Trial.isChecked)
+            if (exact1080Trial.isChecked) directModePlans = directModePlans.filter { it.width == 1920 && it.height == 1080 }
             val summary = directModePlans
                 .distinctBy { it.width to it.height }
                 .joinToString { it.width.toString() + "×" + it.height + "@30" }
@@ -478,6 +483,16 @@ class MainActivity : Activity() {
         }, matchWrap())
         phase3Routes = Spinner(this).apply { isEnabled = false }
         panel.addView(phase3Routes, matchWrap())
+        highResolutionTrial = android.widget.CheckBox(this).apply {
+            text = "High-resolution trial (largest supported mode up to 4K/30)"
+            setOnCheckedChangeListener { _, _ -> refreshPhase3Plans(selectedCameraRoute); renderPhase3() }
+        }
+        panel.addView(highResolutionTrial, matchWrap())
+        exact1080Trial = android.widget.CheckBox(this).apply {
+            text = "1080p configuration trial (overrides 4K trial)"
+            setOnCheckedChangeListener { _, _ -> refreshPhase3Plans(selectedCameraRoute); renderPhase3() }
+        }
+        panel.addView(exact1080Trial, matchWrap())
         phase4ReceiverChoices = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_item,
@@ -654,6 +669,8 @@ class MainActivity : Activity() {
             phase3Snapshot.state == "running" ||
             phase3Snapshot.state == "stopping"
         phase3Routes.isEnabled = !active && cameraRoutes.isNotEmpty()
+        highResolutionTrial.isEnabled = !active
+        exact1080Trial.isEnabled = !active
         phase4DiscoveredReceivers.isEnabled = !active && discoveredReceivers.isNotEmpty()
         phase4DiscoveryButton.text = if (receiverDiscovery?.isRunning == true) {
             "Stop receiver discovery"

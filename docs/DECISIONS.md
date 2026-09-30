@@ -1,5 +1,16 @@
 # DECISIONS.md
 
+2026-10-01 follow-up: after real Xiaomi 4K encode proof, the user authorized
+extending shared native decode through 3840×2160 for a USB-to-OBS trial.
+Normal mode defaults remain unchanged; this is not production qualification.
+
+2026-10-01 scope clarification: the user authorized a bounded higher-resolution
+camera/encoder diagnostic and capture-only trial through 4K30. Normal mode
+selection and the accepted USB baseline remain unchanged. This is not approval
+or qualification of 4K/HDR production delivery; D-012's delivery priority and
+the native decoder's then-current 1080p bound were retained for that capture-only
+step. The authorized shared 4K decoder trial above subsequently expanded the bound.
+
 This file records decisions that should not drift silently.
 
 Status values:
@@ -328,7 +339,10 @@ strengthened timing test; do not map frames to guessed FIFO timestamps.
 Use OBS_SOURCE_ASYNC_VIDEO, unbuffered output and a single latest owned decoded
 frame, submitted on the OBS video tick. Diagnostic mode retains its independent
 settings/marker using async RGBA. Width/height come from the output frames.
-Decoder hardware acceleration/zero-copy remain future measured optimizations.
+The 2026-10-01 authorized high-resolution trial attempts D3D11VA above 1080p,
+with CPU readback/conversion and software recovery on a fresh IDR. Lower modes
+retain software decode. Zero-copy remains future work; real 4K stutter remains
+unresolved and this extension is not production qualification.
 
 AU queue: four / 4 MiB including configuration / 100 ms. Decoder/session has one
 in-flight AU and at most 16 pending PTS entries. Decoded handoff: one / 100 ms.

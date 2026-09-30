@@ -1,5 +1,18 @@
 # TESTING.md
 
+## 2026-10-01 higher-resolution checkpoint gates
+
+Android assembleDebug, testDebugUnitTest and lintDebug cover opt-in 1080p/4K
+selection and bounded sender policies. Native decoder tests cover 720p,
+1080p and 4K with exact PTS and colored Y/U/V assertions; run-video-probe.ps1
+supports -Uhd for synthetic 4K recovery/teardown. CAMSURE_FORCE_SOFTWARE=1
+provides a diagnostic software-only run. Synthetic success does not qualify
+real 4K performance or hardware-failure recovery on every PC.
+See PROGRESS for matched ten-minute Xiaomi USB1080 sender/receiver evidence
+and user-observed 5 GHz1080 / short 2.4 GHz720 results. 2.4 GHz1080 has visible
+drops despite clean sender counters. Receiver loss correlation, multiple phones,
+service-duration battery/thermal behavior and 4K grain/stutter remain open.
+
 ## Purpose
 
 The project must be tested as a live-production system, not merely as a video-demo application.

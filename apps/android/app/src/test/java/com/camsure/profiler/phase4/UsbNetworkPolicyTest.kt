@@ -5,6 +5,42 @@ import org.junit.Test
 import java.net.InetAddress
 
 class UsbNetworkPolicyTest {
+    @Test fun highResolutionPolicyAcceptsLargeKeyframesAndRemainsBounded() {
+        val baseline = SenderPolicy.forSize(1280, 720)
+        assertEquals(512 * 1024, baseline.queuedBytes)
+        assertEquals(8, baseline.burstPackets)
+        val policy = SenderPolicy.forSize(3840, 2160)
+        var now = 1_000_000L
+        val pool = EncodedByteArrayPool()
+        val queue = BoundedAccessUnitQueue(maxQueuedBytes = policy.queuedBytes,
+            maxAccessUnitBytes = policy.accessUnitBytes, maxQueuedUnits = 4,
+            maxQueueAgeMs = 100, nowNanos = { now })
+        fun offer(size: Int, key: Boolean) = queue.offer(PooledPayload(pool, ByteArray(size), size), now / 1000, 0, key)
+        offer(768 * 1024, true)
+        offer(128 * 1024, false)
+        assertEquals(2, queue.snapshot().depth)
+        assertEquals(0L, queue.snapshot().droppedOversized)
+        queue.poll(0)!!.close(); queue.poll(0)!!.close()
+        offer(policy.accessUnitBytes + 1, true)
+        assertEquals(1L, queue.snapshot().droppedOversized)
+        offer(128, false)
+        assertEquals(1L, queue.snapshot().droppedWhileWaitingForKeyFrame)
+        offer(768 * 1024, true)
+        now += 101_000_000L
+        assertNull(queue.poll(0))
+        assertEquals(1L, queue.snapshot().droppedAsStale)
+        queue.abort()
+    }
+
+    @Test fun highResolutionBurstPacingStillLimitsBursts() {
+        var now = 10_000_000L
+        var waited = 0L
+        val pacer = UsbPacketPacer({ now }, { delay -> waited += delay; now += delay }, SenderPolicy.forSize(3840, 2160).burstPackets)
+        repeat(32) { pacer.beforePacket() }
+        assertEquals(0L, waited)
+        pacer.beforePacket()
+        assertEquals(1_000_000L, waited)
+    }
     @Test fun usbBurstPacingDoesNotAccumulateIdleCredit() {
         var now = 10_000_000L
         var waited = 0L

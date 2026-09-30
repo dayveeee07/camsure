@@ -84,6 +84,7 @@ void VideoSession::run() noexcept
  const int64_t began = qpc(); int64_t report = began;
  try {
   auto decoder = make_h264_decoder();
+  std::string reported_backend;
   while (!stop.load()) {
    const std::string path = "\\\\.\\pipe\\" + pipe_name;
    Handle pipe(CreateNamedPipeA(path.c_str(), PIPE_ACCESS_INBOUND | FILE_FLAG_OVERLAPPED | FILE_FLAG_FIRST_PIPE_INSTANCE,
@@ -131,6 +132,10 @@ void VideoSession::run() noexcept
      if (pending_inputs.size() >= 16) throw std::runtime_error("Decoder retained too many inputs");
      pending_inputs.emplace_back(unit.presentation_time_us, submit_time);
      decoder->submit(unit, [&](DecodedVideoFrame frame) {
+      if (reported_backend != decoder->backend()) {
+       reported_backend = decoder->backend();
+       blog(LOG_INFO, "[CamSure] Decoder backend=%s pipe=%s", reported_backend.c_str(), pipe_name.c_str());
+      }
       ++decoded;
       const int64_t available = qpc();
       auto input = std::find_if(pending_inputs.begin(), pending_inputs.end(), [&](const auto &entry) { return entry.first == frame.presentation_time_us; });
@@ -157,6 +162,13 @@ void VideoSession::run() noexcept
       pipe_name.c_str(), (unsigned long long)inputs, (unsigned long long)decoded, (unsigned long long)submitted.load(), (unsigned long long)drops, (unsigned long long)replaced.load(), (unsigned long long)stale.load(), (unsigned long long)resets, (unsigned long long)errors,
       double(inputs) / seconds, double(decoded) / seconds, width, height, max_age, max_decode, max_frame_age.load(), max_output_ms.load(), depth);
      report = qpc();
+     const auto timing = decoder->timing();
+     blog(LOG_INFO, "[CamSure] Decoder timing pipe=%s backend=%s GPU-transfer-avg/max=%.3f/%.3fms pixel-copy-convert-avg/max=%.3f/%.3fms codec-call-avg/max=%.3f/%.3fms transfer-frames=%llu converted-frames=%llu codec-calls=%llu",
+      pipe_name.c_str(), decoder->backend(),
+      timing.transfer_count ? timing.transfer_total_ms / timing.transfer_count : 0.0, timing.transfer_max_ms,
+      timing.conversion_count ? timing.conversion_total_ms / timing.conversion_count : 0.0, timing.conversion_max_ms,
+      timing.codec_count ? timing.codec_total_ms / timing.codec_count : 0.0, timing.codec_max_ms,
+      (unsigned long long)timing.transfer_count, (unsigned long long)timing.conversion_count, (unsigned long long)timing.codec_count);
     }
    }
    { std::lock_guard<std::mutex> lock(frame_mutex); latest.reset(); }

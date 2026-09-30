@@ -185,7 +185,9 @@ class EncoderCapabilityCollector(@Suppress("UNUSED_PARAMETER") context: Context)
         val candidateModes = listOf(
             PixelSize(1280, 720) to 30,
             PixelSize(1920, 1080) to 30,
-            PixelSize(1920, 1080) to 60
+            PixelSize(1920, 1080) to 60,
+            PixelSize(3840, 2160) to 30,
+            PixelSize(3840, 2160) to 60
         )
         val checks = candidateModes.map { (size, fps) ->
             val supported = read("mode_check_${size.width}x${size.height}_$fps") {

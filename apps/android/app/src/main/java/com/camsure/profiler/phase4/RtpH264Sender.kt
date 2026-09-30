@@ -73,9 +73,14 @@ data class RtpH264TransportSnapshot(
 class RtpH264Sender(
     private val endpoint: FixedReceiverEndpoint,
     private val usbLink: UsbNetworkLink? = null,
+    width: Int = 1280,
+    height: Int = 720,
     private val onLinkLost: () -> Unit = {}
 ) : AutoCloseable {
-    internal val queue = if (usbLink == null) BoundedAccessUnitQueue() else BoundedAccessUnitQueue(maxQueuedUnits = 4, maxQueueAgeMs = 100)
+    private val policy = SenderPolicy.forSize(width, height)
+    internal val queue = BoundedAccessUnitQueue(maxQueuedBytes = policy.queuedBytes,
+        maxAccessUnitBytes = policy.accessUnitBytes, maxQueuedUnits = if (usbLink == null) 24 else 4,
+        maxQueueAgeMs = if (usbLink == null) 500 else 100)
     @Volatile private var effectiveSendBufferBytes = 0
     private var nextLinkCheckNs = 0L
     @Volatile private var linkState = if (usbLink == null) "not_applicable" else "checking"
@@ -84,7 +89,7 @@ class RtpH264Sender(
     private val sequence = AtomicLong(secureRandom.nextInt(0x10000).toLong())
     private val packetCount = AtomicLong()
     private val sentByteCount = AtomicLong()
-    private val usbPacketPacer = if (usbLink == null) null else UsbPacketPacer()
+    private val usbPacketPacer = if (usbLink == null) null else UsbPacketPacer(burstPackets = policy.burstPackets)
     private var rateSampleAtNs = android.os.SystemClock.elapsedRealtimeNanos()
     private var rateSampleUnits = 0L
     private var rateSampleBytes = 0L

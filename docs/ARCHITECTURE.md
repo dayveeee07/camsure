@@ -2,6 +2,18 @@
 
 ## System Overview
 
+2026-10-01 experimental extension: shared H.264 decode accepts even-sized
+8-bit frames through 3840x2160. Above 1080p it attempts FFmpeg D3D11VA,
+retains one hardware device per decoder, transfers GPU frames to CPU and
+converts NV12 to owned I420. This is not zero-copy. Software recovery waits
+for a fresh IDR after hardware failure. Stage timing is cumulative per decoder.
+Android high-resolution trials use a bounded 4 MiB queue / 2 MiB individual
+AU limit and USB bursts of 32 packets per minimum millisecond; lower modes
+retain 512 KiB and eight-packet bursts. Existing unit-count/age limits remain.
+4K real output still stutters and is grainy; it is not production-qualified.
+Exact 1080p configuration is an explicit opt-in metadata override trial,
+with actual configure/session/output proof reported separately.
+
 Current implementation (2026-09-30): Camera2/MediaCodec and RTP delivery are
 implemented with prior physical evidence. The transport-neutral AU/FFmpeg/OBS
 bridge is implemented and host-tested. Samsung real phone output, ten-minute

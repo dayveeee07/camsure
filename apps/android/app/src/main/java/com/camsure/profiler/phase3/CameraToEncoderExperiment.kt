@@ -64,7 +64,8 @@ data class DirectModePlan(
     val fpsRange: Range<Int>,
     val cameraAdvertises1080p: Boolean,
     val direct1080pSupported: Boolean,
-    val diagnosticNotes: List<String>
+    val diagnosticNotes: List<String>,
+    val encoderAdvertisesExactMode: Boolean = true
 )
 
 data class ExperimentSnapshot(
@@ -141,7 +142,11 @@ data class ExperimentSnapshot(
     val pathDescription: String =
         "Camera2 writes directly to the MediaCodec input Surface. No ImageReader, CPU pixel copy, or application frame queue is used.",
     val error: String? = null,
-    val planNotes: List<String> = emptyList()
+    val planNotes: List<String> = emptyList(),
+    val sensorSensitivityIso: Int? = null,
+    val sensorExposureTimeNs: Long? = null,
+    val appliedNoiseReductionMode: Int? = null,
+    val appliedEdgeMode: Int? = null
 ) {
     val isTerminal: Boolean
         get() = state == "completed" || state == "stopped" || state == "failed"
@@ -196,14 +201,14 @@ object CameraEncoderExperimentDiscovery {
         )
     }
 
-    fun discoverDirectModes(context: Context, route: CameraRoute): List<DirectModePlan> {
+    fun discoverDirectModes(context: Context, route: CameraRoute, include4k: Boolean = false, trial1080: Boolean = false): List<DirectModePlan> {
         val manager = context.getSystemService(CameraManager::class.java)
             ?: throw IllegalStateException("Camera service is unavailable.")
         val characteristics = manager.getCameraCharacteristics(route.characteristicsCameraId)
         val streamMap = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
             ?: return emptyList()
         val sizes = streamMap.getOutputSizes(MediaCodec::class.java)
-            ?.filter { it.width <= MAX_WIDTH && it.height <= MAX_HEIGHT }
+            ?.filter { it.width <= (if (include4k) 3840 else MAX_WIDTH) && it.height <= (if (include4k) 2160 else MAX_HEIGHT) }
             ?.filter { it.width.toLong() * 9L == it.height.toLong() * 16L }
             ?.distinctBy { it.width to it.height }
             .orEmpty()
@@ -242,7 +247,7 @@ object CameraEncoderExperimentDiscovery {
                 } catch (_: Exception) {
                     false
                 }
-                if (supported) {
+                if (supported || (trial1080 && size.width == 1920 && size.height == 1080)) {
                     val desired = (8_000_000.0 * size.width * size.height / (1920.0 * 1080.0))
                         .roundToLong().toInt().coerceAtLeast(1_500_000)
                     plans += DirectModePlan(
@@ -257,14 +262,34 @@ object CameraEncoderExperimentDiscovery {
                         fpsRange = fpsRange,
                         cameraAdvertises1080p = cameraAdvertises1080,
                         direct1080pSupported = false,
-                        diagnosticNotes = emptyList()
+                        diagnosticNotes = emptyList(),
+                        encoderAdvertisesExactMode = supported
                     )
                 }
             }
         }
 
-        val anyDirect1080 = plans.any { it.width == 1920 && it.height == 1080 }
+        val anyDirect1080 = plans.any { it.width == 1920 && it.height == 1080 && it.encoderAdvertisesExactMode }
         val alignmentNotes = mutableListOf<String>()
+        if (trial1080) alignmentNotes += "Explicit 1080p configuration trial: try real 1920×1080@30 despite encoder metadata rejection. No padding, scaling or crop workaround is applied. Configuration/session/output are unverified until runtime; failure does not silently fall back to 720p."
+        if (include4k) {
+            val advertised = streamMap.getOutputSizes(MediaCodec::class.java).orEmpty()
+            listOf(android.util.Size(1920, 1080), android.util.Size(3840, 2160)).forEach { target ->
+                val cameraSize = advertised.any { it == target }
+                val duration = if (cameraSize) try { streamMap.getOutputMinFrameDuration(MediaCodec::class.java, target) } catch (_: Exception) { 0L } else 0L
+                alignmentNotes += "High-resolution probe ${target}@30: camera output advertised=$cameraSize; minimum frame duration=$duration ns (0 means unknown)."
+                encoders.forEach { info ->
+                    try {
+                        val video = info.getCapabilitiesForType(H264_MIME).videoCapabilities
+                            ?: throw IllegalStateException("No video capabilities")
+                        alignmentNotes += "${info.name}: ${target}@30 supported=${video.areSizeAndRateSupported(target.width, target.height, 30.0)}; alignment=${video.widthAlignment}×${video.heightAlignment}."
+                    } catch (error: Exception) {
+                        alignmentNotes += "${info.name}: ${target}@30 query failed: ${error.javaClass.simpleName}."
+                    }
+                }
+            }
+            alignmentNotes += "Metadata support is not runtime proof. This trial selects the largest exact eligible size up to 3840×2160; confirm the actual requested and output dimensions in runtime JSON."
+        }
         if (cameraAdvertises1080 && !anyDirect1080) {
             val details = encoders.mapNotNull { info ->
                 val video = try {
@@ -432,7 +457,7 @@ class CameraToEncoderExperiment(
         if (terminal.get()) return
         try {
             if (receiverEndpoint != null) {
-                val sender = RtpH264Sender(receiverEndpoint, usbLink) {
+                val sender = RtpH264Sender(receiverEndpoint, usbLink, plan.width, plan.height) {
                     handler.post { if (!terminal.get()) { streamSender?.close(); requestStop("USB link lost or send failed; select link and start a fresh stream.") } }
                 }
                 streamSender = sender
@@ -588,6 +613,14 @@ class CameraToEncoderExperiment(
         ) {
             if (runStartedAtNs == 0L || terminal.get()) return
             captureFrames++
+            if (captureFrames % 30L == 1L) {
+                latestSnapshot = latestSnapshot.copy(
+                    sensorSensitivityIso = result.get(CaptureResult.SENSOR_SENSITIVITY),
+                    sensorExposureTimeNs = result.get(CaptureResult.SENSOR_EXPOSURE_TIME),
+                    appliedNoiseReductionMode = result.get(CaptureResult.NOISE_REDUCTION_MODE),
+                    appliedEdgeMode = result.get(CaptureResult.EDGE_MODE)
+                )
+            }
             val timestamp = result.get(CaptureResult.SENSOR_TIMESTAMP)
             if (timestamp != null && timestamp > 0L) {
                 val previous = lastCaptureTimestampNs
@@ -1043,6 +1076,11 @@ object RuntimeExperimentReportJson {
                 .put("level", snapshot.outputLevel)
                 .put("outputFormat", snapshot.encoderOutputFormat))
             .put("measurements", JSONObject()
+                .put("lastSampledSensorSensitivityIso", snapshot.sensorSensitivityIso ?: JSONObject.NULL)
+                .put("lastSampledSensorExposureTimeNs", snapshot.sensorExposureTimeNs ?: JSONObject.NULL)
+                .put("lastSampledNoiseReductionMode", snapshot.appliedNoiseReductionMode ?: JSONObject.NULL)
+                .put("lastSampledEdgeMode", snapshot.appliedEdgeMode ?: JSONObject.NULL)
+                .put("cameraProcessingSampleNote", "Latest sampled capture result, sampled every 30 frames; null means not reported. Exposure and processing requests were not changed.")
                 .put("captureFrames", snapshot.captureFrames)
                 .put("encodedFrames", snapshot.encodedFrames)
                 .put("keyframes", snapshot.keyframes)
