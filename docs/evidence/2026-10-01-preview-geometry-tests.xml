@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.camsure.profiler.PreviewGeometryTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-01T09:27:12.067Z" hostname="DEYB" time="0.025">
+  <properties/>
+  <testcase name="everySensorAndDisplayRotationFillsViewportWithUniformImageScale" classname="com.camsure.profiler.PreviewGeometryTest" time="0.024"/>
+  <testcase name="nativeLandscapeAndReversePortraitHaveNoExtraSensorRotation" classname="com.camsure.profiler.PreviewGeometryTest" time="0.0"/>
+  <testcase name="portraitPreviewStaysUprightAndCropsToFillTallPhone" classname="com.camsure.profiler.PreviewGeometryTest" time="0.0"/>
+  <testcase name="bothLandscapeDirectionsCompensateDisplayWithoutFlipping" classname="com.camsure.profiler.PreviewGeometryTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

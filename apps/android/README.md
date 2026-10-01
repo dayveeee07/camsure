@@ -1,5 +1,21 @@
 # CamSure Android Camera Profiler and Phase 3 Experiment
 
+## Current interface (2026-10-01)
+
+Launch requests Camera and shows preview. Main has status, Start/Stop and Settings.
+Settings selects camera/resolution and Wireless discovery/manual IPv4 or explicit
+USB tethering adapter/address/peer. Valid selections persist; USB identity/route
+is revalidated. Settings navigation and rotation retain an active stream; restart
+settings lock during it. Normal Start streams continuously until Stop, failure or
+backgrounding. Diagnostics holds profiling, local JSON export and the original
+encoder-only five-minute capture / ten-minute transport tests. Exact 1080p trial
+is explicit opt-in; 4K experimental. Sender activity does not prove UDP reception.
+
+APK: `app/build/outputs/apk/debug/app-debug.apk`.
+Device gate: [ANDROID_UI_TESTING.md](../../docs/ANDROID_UI_TESTING.md).
+Build/tests/lint pass; physical preview and streaming regression acceptance is
+open. The sections below retain earlier phase behavior as historical context.
+
 The Phase 2 Scan capabilities workflow is a native Kotlin metadata profiler. It uses Camera2 characteristics
 and `MediaCodecList`; it does not open a preview/capture session or start an
 encoder. Camera and codec metadata are advertised constraints, not proof that a

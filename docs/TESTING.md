@@ -1,5 +1,34 @@
 # TESTING.md
 
+Transparent-controls follow-up (2026-10-01): verify camera-screen Settings and
+Start/Stop have no filled button background or footer panel, remain readable
+over bright/dark camera scenes, and retain their touch/disabled behavior.
+Settings/Diagnostics remains a separate page. Physical visual retest OPEN.
+
+## Preview sizing/orientation regression (2026-10-01)
+
+User reports previous APK preview was not full-screen and sideways in portrait.
+Retest the replacement APK: rear preview upright in portrait, both landscape
+directions and reverse portrait where supported; front orientation/mirroring;
+camera fills the display behind overlay controls, including after navigation,
+rotation and resize. Center-crop must preserve aspect (some edge content is
+cropped locally); encoder/OBS framing and resolution must remain unchanged.
+Check 180-degree rotations without a resize. Automated geometry tests cover
+fill/no-stretch and no duplicate sensor rotation; they do not inspect device
+camera pixels. Corrected-build physical results remain NOT RUN / OPEN.
+
+## 2026-10-01 Android UI / continuous-mode acceptance gate
+
+Source/build gate passes: assembleDebug, testDebugUnitTest (nine tests, zero
+failures/errors) and lintDebug. See evidence/2026-10-01-android-ui-build-tests.log.
+Physical gate is **NOT RUN / OPEN**: no device was connected. Follow
+[Android UI device checklist](ANDROID_UI_TESTING.md), including preview versus
+encoder-only Diagnostics comparison at identical selected 720p/1080p modes.
+The older no-preview/no-launch-permission procedures below describe historical
+phases. The current launch requests Camera for preview; profiler collection itself
+remains metadata-only. Timed validations remain five/ten minutes; normal Start
+is continuous. Build proof does not establish preview quality or service stability.
+
 ## 2026-10-01 higher-resolution checkpoint gates
 
 Android assembleDebug, testDebugUnitTest and lintDebug cover opt-in 1080p/4K
@@ -823,3 +852,11 @@ User chose to test later. Follow [operator setup and A-H acceptance checklist](U
 results from route capture, real image, 600 s soak, glass-to-glass samples, ten
 cable cycles, consumer stall, OBS frontend lifecycle and post-USB LAN regression.
 None of the older LAN or third-party tethering evidence closes this gate.
+# Settings usability follow-up — physical checks open
+
+Check Wireless/USB selection shows only the relevant setup fields and help;
+discovered PC selection and manual fallback both work; invalid IPv4/USB ports show
+inline errors; valid selections survive restart. While streaming, navigate to
+Settings and back, verify restart-dependent controls are disabled with an
+explanation, and confirm OBS continues smoothly. Expand Diagnostics to verify
+explicit trials, timed tests and JSON export remain accessible.

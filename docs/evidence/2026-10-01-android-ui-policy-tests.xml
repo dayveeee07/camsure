@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.camsure.profiler.session.CameraRunPolicyTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-30T23:58:49.575Z" hostname="DEYB" time="0.008">
+  <properties/>
+  <testcase name="normalStreamsOutliveValidationDeadlineOnEitherTransport" classname="com.camsure.profiler.session.CameraRunPolicyTest" time="0.0"/>
+  <testcase name="settingsStayLockedUntilTerminalTeardown" classname="com.camsure.profiler.session.CameraRunPolicyTest" time="0.007"/>
+  <testcase name="restorationUsesIdentityRatherThanEnumerationOrderAndRejectsAbsentLinks" classname="com.camsure.profiler.session.CameraRunPolicyTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

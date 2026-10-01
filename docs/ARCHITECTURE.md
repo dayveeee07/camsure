@@ -48,6 +48,37 @@ targets; see [the actual Decode → OBS path](DECODE_OBS_REPORT.md#2-final-runti
 
 ## Android Responsibilities
 
+### Current Android UI/session boundary (2026-10-01)
+
+MainActivity owns navigation and persisted selections, a retained TextureView
+Surface and one active camera owner at a time. CameraToEncoderExperiment reuses
+Camera2 session setup/physical routing for idle preview (no codec/transport), or
+normal streaming (encoder Surface plus preview Surface). Preview is bounded to
+a camera-advertised size at or below 1280x720 where available; if none exists,
+the smallest advertised TextureView size is used. Texture rotation/aspect/mirror
+is local display state and never changes encoded dimensions or source PTS.
+Settings overlays the still-attached preview; it does not recreate the session.
+Restart-dependent controls are locked while preparing/running/stopping.
+
+Preview-layout correction (2026-10-01): TextureView now fills the entire window
+with inset-safe controls overlaid. PreviewGeometry undoes texture stretch, applies
+uniform center-crop and inverse display rotation around the viewport center.
+The camera producer already handles sensor orientation/mirroring; app does not
+apply them again. Sensor orientation determines natural buffer dimensions only.
+DisplayManager notifications update the transform even when rotation does not
+resize the view. Cropping affects local preview only, never the encoder target.
+
+Continuous sessions omit the timer; Diagnostics retains encoder-only five/ten
+minute runs. Stop closes capture and camera, drains codec EOS with the existing
+three-second fallback, releases codec/input Surface, closes/joins transport
+workers and quits the camera handler. Preview reopens only after terminal cleanup.
+Background stops both owners; no foreground service/background capture is added.
+Selected local LAN network loss/address change and USB explicit-link failure require a fresh
+Start; decoder SPS/PPS+IDR recovery and bounded queues remain unchanged.
+Silent remote UDP receiver loss remains unobservable at the sender.
+New JSON run.mode and run.previewIncluded label comparison evidence. Actual
+preview/session support and accepted streaming performance require device tests.
+
 The Android application owns:
 
 ```text

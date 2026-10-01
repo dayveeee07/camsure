@@ -69,6 +69,8 @@ data class DirectModePlan(
 )
 
 data class ExperimentSnapshot(
+    val runMode: String = "timed_validation",
+    val previewIncluded: Boolean = false,
     val state: String = "ready",
     val message: String = "Prepare camera routes before starting a run.",
     val deviceManufacturer: String = Build.MANUFACTURER.orEmpty(),
@@ -350,7 +352,10 @@ class CameraToEncoderExperiment(
     private val plan: DirectModePlan,
     private val onSnapshot: (ExperimentSnapshot) -> Unit,
     private val receiverEndpoint: FixedReceiverEndpoint? = null,
-    private val usbLink: com.camsure.profiler.phase4.UsbNetworkLink? = null
+    private val usbLink: com.camsure.profiler.phase4.UsbNetworkLink? = null,
+    private val previewSurface: Surface? = null,
+    private val previewOnly: Boolean = false,
+    private val continuous: Boolean = false
 ) {
     private val appContext = context.applicationContext
     private val cameraManager = appContext.getSystemService(CameraManager::class.java)
@@ -404,13 +409,14 @@ class CameraToEncoderExperiment(
     private var currentMessage = "Creating hardware encoder input surface…"
     private var currentError: String? = null
     private val runDurationMinutes = if (receiverEndpoint == null) 5 else 10
-    private val runDurationMs = runDurationMinutes * 60_000L
     private val completedRunReason = "The " + runDurationMinutes + "-minute run completed."
     private var stopReason = completedRunReason
     private var isStopping = false
 
     @Volatile
     private var latestSnapshot = ExperimentSnapshot(
+        runMode = if (previewOnly) "preview" else if (continuous) "continuous" else "timed_validation",
+        previewIncluded = previewSurface != null,
         state = "preparing",
         message = "Preparing " + route.label + " for " + plan.width + "×" + plan.height + "@30.",
         appVersionName = com.camsure.profiler.BuildConfig.VERSION_NAME,
@@ -445,6 +451,10 @@ class CameraToEncoderExperiment(
         requestStop("Stopped because the app left the foreground.")
     }
 
+    fun stopForLinkLoss() {
+        handler.post { fail("Connection lost. Check the selected link and restart the stream.", null) }
+    }
+
     private fun requestStop(reason: String) {
         handler.post {
             if (terminal.get() || isStopping) return@post
@@ -458,7 +468,7 @@ class CameraToEncoderExperiment(
         try {
             if (receiverEndpoint != null) {
                 val sender = RtpH264Sender(receiverEndpoint, usbLink, plan.width, plan.height) {
-                    handler.post { if (!terminal.get()) { streamSender?.close(); requestStop("USB link lost or send failed; select link and start a fresh stream.") } }
+                    handler.post { if (!terminal.get()) fail("Connection lost or send failed; select the link and start a fresh stream.", null) }
                 }
                 streamSender = sender
                 accessUnitSink = EncodedAccessUnitSink(
@@ -471,27 +481,29 @@ class CameraToEncoderExperiment(
                     timestampCaveat = "MediaCodec PTS stays the source of truth. RTP uses a per-stream 90 kHz mapping; the prototype also carries exact source PTS in an RFC 8285 extension for receiver comparison."
                 )
             }
-            val created = MediaCodec.createByCodecName(plan.encoderName)
-            codec = created
-            created.setCallback(encoderCallback, handler)
-            val format = MediaFormat.createVideoFormat(MediaFormat.MIMETYPE_VIDEO_AVC, plan.width, plan.height).apply {
-                setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
-                setInteger(MediaFormat.KEY_BIT_RATE, plan.bitrateBps)
-                setInteger(MediaFormat.KEY_FRAME_RATE, 30)
-                setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)
-                setInteger(MediaFormat.KEY_BITRATE_MODE, plan.bitrateMode)
+            if (!previewOnly) {
+                val created = MediaCodec.createByCodecName(plan.encoderName)
+                codec = created
+                created.setCallback(encoderCallback, handler)
+                val format = MediaFormat.createVideoFormat(MediaFormat.MIMETYPE_VIDEO_AVC, plan.width, plan.height).apply {
+                    setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
+                    setInteger(MediaFormat.KEY_BIT_RATE, plan.bitrateBps)
+                    setInteger(MediaFormat.KEY_FRAME_RATE, 30)
+                    setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)
+                    setInteger(MediaFormat.KEY_BITRATE_MODE, plan.bitrateMode)
+                }
+                created.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+                inputSurface = created.createInputSurface()
+                created.start()
+                encoderReady = true
+                latestSnapshot = latestSnapshot.copy(encoderConfigurationSucceeded = true)
+                Log.i(
+                    TAG,
+                    "Hardware encoder configured: " + plan.encoderName + " " +
+                        plan.width + "×" + plan.height + "@30, bitrate=" +
+                        plan.bitrateBps + ", mode=" + plan.bitrateModeName
+                )
             }
-            created.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
-            inputSurface = created.createInputSurface()
-            created.start()
-            encoderReady = true
-            latestSnapshot = latestSnapshot.copy(encoderConfigurationSucceeded = true)
-            Log.i(
-                TAG,
-                "Hardware encoder configured: " + plan.encoderName + " " +
-                    plan.width + "×" + plan.height + "@30, bitrate=" +
-                    plan.bitrateBps + ", mode=" + plan.bitrateModeName
-            )
             update("opening_camera", "Opening Camera2 camera " + route.cameraId + "…")
             if (appContext.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 fail("Camera permission was revoked before Camera2 could open.", null)
@@ -528,7 +540,7 @@ class CameraToEncoderExperiment(
 
     @Suppress("DEPRECATION")
     private fun configureCaptureSession(device: CameraDevice) {
-        val surface = inputSurface ?: run {
+        val surface = (if (previewOnly) previewSurface else inputSurface) ?: run {
             fail("MediaCodec did not provide an input Surface.", null)
             return
         }
@@ -545,6 +557,7 @@ class CameraToEncoderExperiment(
                     try {
                         val request = device.createCaptureRequest(CameraDevice.TEMPLATE_RECORD).apply {
                             addTarget(surface)
+                            if (!previewOnly) previewSurface?.let { addTarget(it) }
                             set(CaptureRequest.CONTROL_MODE, CaptureRequest.CONTROL_MODE_AUTO)
                             set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON)
                             set(CaptureRequest.CONTROL_AE_TARGET_FPS_RANGE, plan.fpsRange)
@@ -559,7 +572,7 @@ class CameraToEncoderExperiment(
                         elapsedSampleNs = runStartedAtNs
                         thermalAtStart = currentThermalStatus()
                         batteryAtStart = readBattery()
-                        update("running", "Running direct Camera2 → hardware H.264 for " + runDurationMinutes + " minutes.")
+                        update("running", if (previewOnly) "Preview active." else if (continuous) "Continuous streaming active." else "Running direct Camera2 → hardware H.264 for " + runDurationMinutes + " minutes.")
                         session.setRepeatingRequest(request, captureCallback, handler)
                         Log.i(
                             TAG,
@@ -567,7 +580,8 @@ class CameraToEncoderExperiment(
                                 ", physicalCameraId=" + route.physicalCameraId +
                                 ", route=" + route.label + ", AE FPS range=" + plan.fpsRange
                         )
-                        handler.postDelayed(autoStop, runDurationMs)
+                        com.camsure.profiler.session.CameraRunPolicy.deadlineMs(previewOnly, continuous, receiverEndpoint != null)
+                            ?.let { handler.postDelayed(autoStop, it) }
                         handler.postDelayed(metricsTick, METRICS_INTERVAL_MS)
                     } catch (error: Exception) {
                         fail("Camera capture session could not start: " + error.javaClass.simpleName + ": " + error.message, error)
@@ -588,13 +602,15 @@ class CameraToEncoderExperiment(
                 val executor = Executor { runnable -> handler.post(runnable) }
                 val config = SessionConfiguration(
                     SessionConfiguration.SESSION_REGULAR,
-                    listOf(output),
+                    listOf(output) + if (!previewOnly && previewSurface != null) listOf(OutputConfiguration(previewSurface).apply {
+                        route.physicalCameraId?.let { setPhysicalCameraId(it) }
+                    }) else emptyList(),
                     executor,
                     callback
                 )
                 device.createCaptureSession(config)
             } else {
-                device.createCaptureSession(listOf(surface), callback, handler)
+                device.createCaptureSession(listOfNotNull(surface, if (!previewOnly) previewSurface else null), callback, handler)
             }
         } catch (error: Exception) {
             fail("Camera capture session configuration failed: " + error.javaClass.simpleName + ": " + error.message, error)
@@ -743,6 +759,7 @@ class CameraToEncoderExperiment(
         captureSession = null
         camera?.close()
         camera = null
+        if (previewOnly || codec == null) { finishRun(completed); return }
         try {
             codec?.signalEndOfInputStream()
             handler.postDelayed({ if (!terminal.get()) finishRun(completed) }, EOS_TIMEOUT_MS)
@@ -889,7 +906,7 @@ class CameraToEncoderExperiment(
             keyframes++
             val previousKeyframe = lastKeyframePtsUs
             if (previousKeyframe != null && pts > previousKeyframe) {
-                keyframeIntervalsUs += pts - previousKeyframe
+                if (keyframeIntervalsUs.size < MAX_TIMESTAMP_SAMPLES) keyframeIntervalsUs += pts - previousKeyframe
             }
             lastKeyframePtsUs = pts
         }
@@ -1044,6 +1061,8 @@ object RuntimeExperimentReportJson {
                 .put("buildId", snapshot.buildId)
                 .put("appVersionName", snapshot.appVersionName))
             .put("run", JSONObject()
+                .put("mode", snapshot.runMode)
+                .put("previewIncluded", snapshot.previewIncluded)
                 .put("state", snapshot.state)
                 .put("startedAt", snapshot.startedAt)
                 .put("finishedAt", snapshot.finishedAt)

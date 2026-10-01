@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.camsure.profiler.phase4.UsbNetworkPolicyTest" tests="6" skipped="0" failures="0" errors="0" timestamp="2026-09-30T23:58:49.547Z" hostname="DEYB" time="0.026">
+  <properties/>
+  <testcase name="highResolutionBurstPacingStillLimitsBursts" classname="com.camsure.profiler.phase4.UsbNetworkPolicyTest" time="0.004"/>
+  <testcase name="highResolutionPolicyAcceptsLargeKeyframesAndRemainsBounded" classname="com.camsure.profiler.phase4.UsbNetworkPolicyTest" time="0.004"/>
+  <testcase name="boundedQueueStallAndEpochAbort" classname="com.camsure.profiler.phase4.UsbNetworkPolicyTest" time="0.007"/>
+  <testcase name="usbBurstPacingDoesNotAccumulateIdleCredit" classname="com.camsure.profiler.phase4.UsbNetworkPolicyTest" time="0.001"/>
+  <testcase name="usbBurstPacingRechecksEarlyWakeups" classname="com.camsure.profiler.phase4.UsbNetworkPolicyTest" time="0.0"/>
+  <testcase name="subnetAndAddressPolicy" classname="com.camsure.profiler.phase4.UsbNetworkPolicyTest" time="0.01"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

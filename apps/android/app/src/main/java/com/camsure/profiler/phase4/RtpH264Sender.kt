@@ -249,7 +249,8 @@ class RtpH264Sender(
                 state = "failed"
                 sendFailureCount.incrementAndGet()
                 queue.abort()
-                if (usbLink != null) { linkState = "lost_or_failed"; onLinkLost() }
+                linkState = "lost_or_failed"
+                onLinkLost()
             }
         } finally {
             try { socket?.close() } catch (_: Exception) {}

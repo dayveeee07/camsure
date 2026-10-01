@@ -2,6 +2,90 @@
 
 This file tracks verified implementation status.
 
+## 2026-10-01: Transparent camera controls
+
+Removed the dark footer panel and default filled button backgrounds from the
+camera screen. Settings and compact Start/Stop actions now float directly over
+the full-window preview. Status uses centered white text with a small shadow;
+controls retain inset-safe placement, touch targets and disabled-state feedback.
+The separate Settings/Diagnostics page and camera/encoder lifecycle are unchanged.
+Build/lint evidence: evidence/2026-10-01-transparent-controls-build-lint.log.
+Physical visual acceptance remains OPEN: check controls on bright/dark scenes,
+portrait/landscape and during streaming, with camera visible behind every action.
+
+## 2026-10-01: Full-screen preview and portrait orientation correction
+
+User physical feedback: camera preview did not fill the screen and appeared
+sideways in portrait. The prior local transform applied SENSOR_ORIENTATION a
+second time despite TextureView's camera-producer sensor transform. It also
+letterboxed inside a padded layout with separate control rows.
+
+Replaced the layout with a full-window preview and inset-safe Settings / status /
+Start-Stop overlays. Local center-crop fills the viewport without image stretch;
+edge cropping is display-only, not a change to encoded framing/resolution. Undo
+TextureView's default stretch using the sensor-oriented buffer dimensions, then
+apply uniform fill and only inverse display rotation. Removed the additional
+front flip; retain the camera producer's orientation/mirroring. Display-change
+notifications cover 180-degree changes that do not resize the view. No camera,
+encoder, transport, queue or OBS configuration changes in this correction.
+
+Added geometry regression tests for portrait, both landscape directions, reverse
+portrait and natural-landscape sensors; all sensor/display quarter-turns across
+four viewport shapes must cover the screen with uniform image scaling.
+assembleDebug, all 13 unit tests and lintDebug pass; git diff --check passes.
+Build/test/lint evidence: evidence/2026-10-01-preview-layout-build-tests.log.
+Geometry test XML: evidence/2026-10-01-preview-geometry-tests.xml (4 tests).
+Physical corrected-build acceptance remains OPEN: retest upright rear/front
+preview, full-screen coverage and streaming rotation on the affected phone.
+Reference: https://developer.android.com/media/camera/camera2/camera-preview
+(TextureView already rotates sensor buffers; app handles display rotation/scaling).
+
+## 2026-10-01: Preview-first Android UI and continuous streaming
+
+**Status: IMPLEMENTED / HOST VERIFIED; physical acceptance OPEN.** Based on
+main bb9a7b0. No commit or push. Existing untracked evidence files were preserved.
+
+Main screen now contains a permission-gated camera preview, connection state,
+one Start/Stop action and Settings. Settings is a separate in-activity page;
+its overlay keeps the TextureView attached and does not stop a stream. Camera,
+resolution, endpoint, transport and USB inventory edits are locked while active.
+Diagnostics contains profiling, JSON export and the existing five-minute
+capture-only / ten-minute RTP validations. Diagnostics keeps the original
+encoder-only capture target, enabling a preview/no-preview comparison.
+
+One CameraToEncoderExperiment owner handles idle preview or camera/encoder
+streaming. Preview adds a camera output Surface; it adds no ImageReader, raw
+pixel copy or second camera session while streaming. Idle preview stops/releases
+before starting the encoder. Continuous use has no timer; timed diagnostics
+retain their deadlines. Timestamp/failure/keyframe sample collections are bounded.
+Stop/background/failure release camera, codec and sender; foreground return
+reopens preview and requires an explicit stream restart. Rotation keeps the
+activity/session and changes only the local preview transform. Camera/service
+interruptions and USB loss retain explicit errors; LAN selected-network loss or
+change fails the session and requires restart. UDP has no receiver acknowledgement:
+"sender active" is not PC connection/OBS reception proof.
+
+Valid route/resolution, Wireless/USB, IPv4/port and explicit USB interface/address/
+prefix/index selection persist locally. Missing/changed USB selections are not
+replaced by another candidate; route/bind checks still run at Start. Discovery
+selection is saved as a manual endpoint fallback, including its advertised port.
+720p and supported 1080p are selectable; exact-1080p metadata override remains
+explicit opt-in. 4K remains experimental, without optimization or band inference.
+Prior Xiaomi USB1080 matched ten-minute totals and the 5 GHz1080 / 2.4 GHz720
+visual observations remain device/setup-specific; 2.4 GHz1080 visible drops and
+4K grain/drops remain unresolved. No Windows receiver/native OBS changes.
+
+Host verification: assembleDebug, testDebugUnitTest and lintDebug pass; nine
+unit tests (six existing transport/bounds tests plus three run-policy/identity
+restoration tests), zero failures/errors. Lint passes with existing-style
+localization warnings. Evidence: evidence/2026-10-01-android-ui-build-tests.log.
+New runtime JSON run fields distinguish continuous/timed validation and preview.
+Physical checks: NOT RUN. adb devices returned no connected device. Preview
+orientation, permissions, persistent selection, navigation/rotation, lifecycle,
+LAN/USB loss and accepted 720p/1080p visual/performance regression remain OPEN.
+Follow ANDROID_UI_TESTING.md; do not mark this slice physically accepted on build
+proof. Next slice is this device acceptance gate, without audio/controls/multicamera.
+
 ## 2026-10-01: Xiaomi wireless band comparison checkpoint
 
 User identifies phase4-lan-20261001-072330 as 5 GHz and 072503 as 2.4 GHz.
@@ -1360,3 +1444,12 @@ Build/self-tests pass, including a blocked telemetry sink with 1,000 publication
 and one pending snapshot. Physical retest is required; this is not a fixed claim.
 Prepared helper: tools/windows-rtp-receiver/bin/usb-refinement/CamSure.RtpReceiver.dll.
 No Android APK change is required for this refinement.
+# Settings usability follow-up — 2026-10-01
+
+Settings now groups Connection and Camera, with Wireless/USB Network radio choices,
+mode-specific help and fields, labelled lens/resolution choices, automatic-save
+feedback, and inline IPv4/USB-port validation. Trials and timed tests remain under
+Diagnostics. Active-session locks explain how to change settings. Physical UX
+acceptance remains open; no receiver/native OBS changes.
+
+Settings follow-up source proof: assembleDebug, 13 unit tests and lintDebug passed; evidence/2026-10-01-settings-ux-build-tests.log. Physical checks remain separate and open.

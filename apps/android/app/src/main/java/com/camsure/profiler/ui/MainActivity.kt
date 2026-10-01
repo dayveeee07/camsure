@@ -13,7 +13,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.view.Gravity
 import android.view.View
-import android.view.WindowInsets
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
@@ -78,6 +77,7 @@ class MainActivity : Activity() {
     private lateinit var usbMode: android.widget.CheckBox
     private lateinit var usbAddresses: Spinner
     private lateinit var usbPort: EditText
+    private lateinit var usbRefreshButton: Button
     private lateinit var usbStatus: TextView
     private var usbCandidates = emptyList<com.camsure.profiler.phase4.UsbNetworkLink>()
     private var receiverDiscovery: NsdReceiverDiscovery? = null
@@ -85,19 +85,78 @@ class MainActivity : Activity() {
     private var selectedDiscoveredReceiver: DiscoveredReceiver? = null
     private lateinit var phase4ReceiverChoices: ArrayAdapter<ReceiverChoice>
 
+    private lateinit var preview: android.view.TextureView
+    private var previewSurface: android.view.Surface? = null
+    private var previewRun: CameraToEncoderExperiment? = null
+    private var previewStopping = false
+    private var afterPreviewStop: (() -> Unit)? = null
+    private var foreground = false
+    private var normalRun = false
+    private lateinit var homeStatus: TextView
+    private lateinit var homeStart: Button
+    private lateinit var settingsPage: ScrollView
+    private lateinit var modes: Spinner
+    private lateinit var diagnostics: LinearLayout
+    private lateinit var connectionModes: android.widget.RadioGroup
+    private lateinit var wirelessOption: android.widget.RadioButton
+    private lateinit var usbOption: android.widget.RadioButton
+    private lateinit var wirelessSettings: LinearLayout
+    private lateinit var usbSettings: LinearLayout
+    private lateinit var settingsNotice: TextView
+    private lateinit var pcAddressLabel: TextView
+    private lateinit var resolutionHint: TextView
+    private var settingsOpen = false
+    private var settingsLoaded = false
+    private var previewSize = android.util.Size(1280, 720)
+    private var lanMonitor: android.net.ConnectivityManager.NetworkCallback? = null
+    private val previewDisplayListener = object : android.hardware.display.DisplayManager.DisplayListener {
+        override fun onDisplayAdded(displayId: Int) {}
+        override fun onDisplayRemoved(displayId: Int) {}
+        override fun onDisplayChanged(displayId: Int) {
+            if (::preview.isInitialized && preview.display?.displayId == displayId) preview.post { transformPreview() }
+        }
+    }
+    private var backCallback: android.window.OnBackInvokedCallback? = null
+    private val prefs by lazy { getSharedPreferences("camera-settings", MODE_PRIVATE) }
+
     private val snapshotListener: (ProfilerSnapshot) -> Unit = { snapshot -> render(snapshot) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (Build.VERSION.SDK_INT >= 30) window.setDecorFitsSystemWindows(false) else {
+            @Suppress("DEPRECATION")
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+        }
         buildUi()
+        if (Build.VERSION.SDK_INT >= 33) {
+            backCallback = android.window.OnBackInvokedCallback { leaveSettingsOrFinish() }
+            onBackInvokedDispatcher.registerOnBackInvokedCallback(android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT, backCallback!!)
+        }
+        requestCameraPermission(CameraAction.PREPARE_PHASE3)
     }
 
     override fun onStart() {
         super.onStart()
+        foreground = true
+        getSystemService(android.hardware.display.DisplayManager::class.java)
+            .registerDisplayListener(previewDisplayListener, android.os.Handler(mainLooper))
         ProfilerSession.attach(snapshotListener)
+        if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            permissionMessage = null
+            permanentlyDenied = false
+            if (cameraRoutes.isEmpty()) preparePhase3Routes() else ensurePreview()
+        }
+        if (usbMode.isChecked && !isStreamActive()) refreshUsbNetworks()
+        if (phase4ReceiverIp.text.isBlank() && selectedDiscoveredReceiver == null) phase4ReceiverIp.setText(prefs.getString("address", ""))
     }
 
     override fun onStop() {
+        foreground = false
+        getSystemService(android.hardware.display.DisplayManager::class.java).unregisterDisplayListener(previewDisplayListener)
+        saveSettings()
+        stopLanMonitor()
+        stopPreview()
         stopReceiverDiscovery()
         if (!phase3Snapshot.isTerminal) phase3Experiment?.stopForBackground()
         ProfilerSession.detach(snapshotListener)
@@ -106,51 +165,16 @@ class MainActivity : Activity() {
 
     override fun onDestroy() {
         activityDestroyed = true
+        stopLanMonitor()
+        stopPreview()
+        if (Build.VERSION.SDK_INT >= 33) backCallback?.let { onBackInvokedDispatcher.unregisterOnBackInvokedCallback(it) }
         stopReceiverDiscovery()
         if (!phase3Snapshot.isTerminal) phase3Experiment?.stopForBackground()
+        if (previewRun == null && !isStreamActive()) { previewSurface?.release(); previewSurface = null }
         super.onDestroy()
     }
 
     private fun buildUi() {
-        val root = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            setBackgroundColor(0xFFF5F6F7.toInt())
-            clipToPadding = false
-            setPadding(dp(16), dp(14), dp(16), dp(16))
-            setOnApplyWindowInsetsListener { view, insets ->
-                val topInset: Int
-                val bottomInset: Int
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    val bars = insets.getInsets(WindowInsets.Type.systemBars())
-                    topInset = bars.top
-                    bottomInset = bars.bottom
-                } else {
-                    @Suppress("DEPRECATION")
-                    val top = insets.systemWindowInsetTop
-                    @Suppress("DEPRECATION")
-                    val bottom = insets.systemWindowInsetBottom
-                    topInset = top
-                    bottomInset = bottom
-                }
-                view.setPadding(dp(16), dp(14) + topInset, dp(16), dp(16) + bottomInset)
-                insets
-            }
-        }
-
-        val title = TextView(this).apply {
-            text = getString(R.string.profiler_title)
-            textSize = 24f
-            setTextColor(0xFF182022.toInt())
-            typeface = Typeface.DEFAULT_BOLD
-        }
-        root.addView(title, matchWrap())
-        root.addView(TextView(this).apply {
-            text = getString(R.string.profiler_subtitle)
-            textSize = 14f
-            setTextColor(0xFF536164.toInt())
-            setPadding(0, dp(3), 0, dp(10))
-        }, matchWrap())
-
         content = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         scanButton = actionButton("Scan capabilities") { requestCameraPermissionOrScan() }
         exportButton = actionButton("Export JSON") { openDocumentPicker() }
@@ -185,8 +209,97 @@ class MainActivity : Activity() {
             isFillViewport = true
             addView(content, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT))
         }
-        root.addView(scroll, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f))
-        setContentView(root)
+        val frame = FrameLayout(this)
+        val home = FrameLayout(this).apply { setBackgroundColor(android.graphics.Color.BLACK) }
+        val gear = overlayButton("⚙") { showSettings(true) }.apply {
+            contentDescription = "Settings"
+            textSize = 28f
+            setPadding(0, 0, 0, 0)
+        }
+        preview = android.view.TextureView(this).apply {
+            surfaceTextureListener = object : android.view.TextureView.SurfaceTextureListener {
+                override fun onSurfaceTextureAvailable(texture: android.graphics.SurfaceTexture, width: Int, height: Int) { ensurePreview() }
+                override fun onSurfaceTextureSizeChanged(texture: android.graphics.SurfaceTexture, width: Int, height: Int) { transformPreview() }
+                override fun onSurfaceTextureUpdated(texture: android.graphics.SurfaceTexture) {}
+                override fun onSurfaceTextureDestroyed(texture: android.graphics.SurfaceTexture): Boolean {
+                    stopPreview()
+                    if (isStreamActive()) phase3Experiment?.stopForBackground()
+                    return true
+                }
+            }
+        }
+        home.addView(preview, FrameLayout.LayoutParams(-1, -1))
+        val footer = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(12), dp(8), dp(12), dp(8))
+        }
+        homeStatus = TextView(this).apply {
+            textSize = 14f
+            gravity = Gravity.CENTER
+            setTextColor(android.graphics.Color.WHITE)
+            setShadowLayer(dp(2).toFloat(), 0f, dp(1).toFloat(), android.graphics.Color.BLACK)
+            accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
+        }
+        footer.addView(homeStatus, matchWrap())
+        homeStart = overlayButton("Start") {
+            if (isStreamActive()) stopPhase3Experiment()
+            else if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                if (permanentlyDenied) openAppSettings() else requestCameraPermission(CameraAction.PREPARE_PHASE3)
+            } else {
+                normalRun = true
+                runtimeReportExported = true
+                stopPreview { startPhase3Experiment() }
+            }
+        }
+        footer.addView(homeStart, LinearLayout.LayoutParams(-2, dp(56)).apply { gravity = Gravity.CENTER_HORIZONTAL })
+        home.addView(gear, FrameLayout.LayoutParams(dp(56), dp(56), Gravity.TOP or Gravity.END))
+        home.addView(footer, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
+        home.setOnApplyWindowInsetsListener { _, insets ->
+            val left: Int; val top: Int; val right: Int; val bottom: Int
+            if (Build.VERSION.SDK_INT >= 30) {
+                val safe = insets.getInsets(android.view.WindowInsets.Type.systemBars() or android.view.WindowInsets.Type.displayCutout())
+                left = safe.left; top = safe.top; right = safe.right; bottom = safe.bottom
+            } else {
+                @Suppress("DEPRECATION")
+                val safe = android.graphics.Rect(insets.systemWindowInsetLeft, insets.systemWindowInsetTop, insets.systemWindowInsetRight, insets.systemWindowInsetBottom)
+                left = safe.left; top = safe.top; right = safe.right; bottom = safe.bottom
+            }
+            gear.layoutParams = (gear.layoutParams as FrameLayout.LayoutParams).apply { topMargin = top + dp(8); marginEnd = right + dp(12) }
+            footer.layoutParams = (footer.layoutParams as FrameLayout.LayoutParams).apply {
+                leftMargin = left + dp(12); rightMargin = right + dp(12); bottomMargin = bottom + dp(8)
+            }
+            insets
+        }
+        frame.addView(home)
+        settingsPage = scroll.apply { setBackgroundColor(0xFFF5F6F7.toInt()); visibility = View.GONE }
+        settingsPage.setOnApplyWindowInsetsListener { view, insets ->
+            @Suppress("DEPRECATION")
+            view.setPadding(dp(16), dp(8) + insets.systemWindowInsetTop, dp(16), dp(8) + insets.systemWindowInsetBottom)
+            insets
+        }
+        content.addView(actionButton("Done · Back to camera") { saveSettings(); showSettings(false); ensurePreview() }, 0)
+        frame.addView(settingsPage)
+        setContentView(frame)
+        phase4ReceiverIp.setText(prefs.getString("address", ""))
+        usbPort.setText(prefs.getString("port", "5004"))
+        highResolutionTrial.isChecked = prefs.getBoolean("experimental4k", false)
+        exact1080Trial.isChecked = prefs.getBoolean("exact1080", false)
+        usbMode.isChecked = prefs.getBoolean("usb", false)
+        settingsLoaded = true
+        val saveText = object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) { validateSettingsInputs(); saveSettings() }
+        }
+        phase4ReceiverIp.addTextChangedListener(saveText)
+        usbPort.addTextChangedListener(saveText)
+        val saveSelection = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) { saveSettings() }
+        }
+        modes.onItemSelectedListener = saveSelection
+        usbAddresses.onItemSelectedListener = saveSelection
+        renderHome()
     }
 
     private fun requestCameraPermissionOrScan() {
@@ -207,7 +320,7 @@ class MainActivity : Activity() {
         permanentlyDenied = askedBefore && !shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)
         preferences.edit().putBoolean(KEY_ASKED_CAMERA_PERMISSION, true).apply()
         val actionMessage = if (action == CameraAction.PREPARE_PHASE3) {
-            "Camera permission is needed to prepare and run the Phase 3 Camera2 capture experiment."
+            "Allow Camera to show the preview and stream."
         } else {
             "Camera permission is needed only when scanning Camera2 metadata. Grant it to continue."
         }
@@ -217,6 +330,7 @@ class MainActivity : Activity() {
             actionMessage
         }
         render(ProfilerSession.current())
+        renderHome()
         requestPermissions(arrayOf(Manifest.permission.CAMERA), REQUEST_CAMERA_PERMISSION)
     }
 
@@ -236,12 +350,13 @@ class MainActivity : Activity() {
                 "Camera permission is blocked. Open app settings, allow Camera, then retry the selected action."
             } else {
                 if (pendingCameraAction == CameraAction.PREPARE_PHASE3) {
-                    "Camera permission was denied. Tap Prepare camera routes to retry."
+                    "Camera permission was denied. Tap Allow Camera to retry."
                 } else {
                     "Camera permission was denied. Tap Scan capabilities to retry."
                 }
             }
             render(ProfilerSession.current())
+            renderHome()
         }
     }
 
@@ -267,8 +382,8 @@ class MainActivity : Activity() {
                     phase3Snapshot = ExperimentSnapshot(state = "ready", message = phase3PlanMessage)
                 }
             } else {
-                val defaultIndex = cameraRoutes.indexOfFirst { it.physicalCameraId == null }
-                    .coerceAtLeast(0)
+                val defaultIndex = cameraRoutes.indexOfFirst { it.cameraId + ":" + it.physicalCameraId == prefs.getString("route", "") }
+                    .takeIf { it >= 0 } ?: cameraRoutes.indexOfFirst { it.physicalCameraId == null }.coerceAtLeast(0)
                 phase3Routes.setSelection(defaultIndex)
                 selectedCameraRoute = cameraRoutes[defaultIndex]
                 refreshPhase3Plans(selectedCameraRoute)
@@ -286,9 +401,11 @@ class MainActivity : Activity() {
             }
         }
         renderPhase3()
+        ensurePreview()
     }
 
     private fun refreshPhase3Plans(route: CameraRoute?) {
+        if (isStreamActive()) return
         selectedCameraRoute = route
         if (route == null) {
             directModePlans = emptyList()
@@ -299,7 +416,10 @@ class MainActivity : Activity() {
             directModePlans = CameraEncoderExperimentDiscovery.discoverDirectModes(this, route,
                 include4k = highResolutionTrial.isChecked && !exact1080Trial.isChecked,
                 trial1080 = exact1080Trial.isChecked)
-            if (exact1080Trial.isChecked) directModePlans = directModePlans.filter { it.width == 1920 && it.height == 1080 }
+            val choices = directModePlans.distinctBy { it.width to it.height }
+            modes.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
+                choices.map { "${it.width}×${it.height} · 30 fps" + if (it.width > 1920) " · Experimental" else "" })
+            modes.setSelection(choices.indexOfFirst { "${it.width}x${it.height}" == prefs.getString("resolution", "") }.coerceAtLeast(0))
             val summary = directModePlans
                 .distinctBy { it.width to it.height }
                 .joinToString { it.width.toString() + "×" + it.height + "@30" }
@@ -339,7 +459,16 @@ class MainActivity : Activity() {
     }
 
     private fun startPhase3Experiment() {
-        val route = selectedCameraRoute ?: return
+        if (!foreground || isStreamActive()) return
+        saveSettings()
+        val route = selectedCameraRoute ?: run {
+            phase3Snapshot = phase3Snapshot.copy(state = "failed", message = "No camera route is available. Allow Camera or retry in Diagnostics.")
+            renderPhase3(); return
+        }
+        if (normalRun && previewSurface == null) {
+            phase3Snapshot = phase3Snapshot.copy(state = "failed", message = "Preview is not ready. Return to the camera and retry.")
+            renderPhase3(); return
+        }
         val receiverText = phase4ReceiverIp.text?.toString()?.trim().orEmpty()
         var receiverEndpoint = if (receiverText.isBlank()) {
             selectedDiscoveredReceiver?.endpoint
@@ -356,12 +485,19 @@ class MainActivity : Activity() {
             if (port == null || port !in 1..65535) { phase3PlanMessage = "Enter a USB media port from 1 to 65535."; renderPhase3(); return }
             receiverEndpoint = receiverEndpoint?.copy(port = port)
         }
+        if (!usbMode.isChecked && receiverText.isNotBlank() && receiverText == prefs.getString("discoveredAddress", null)) {
+            receiverEndpoint = receiverEndpoint?.copy(port = prefs.getInt("discoveredPort", 5004))
+        }
         val selectedUsb = if (usbMode.isChecked) usbCandidates.getOrNull(usbAddresses.selectedItemPosition - 1) else null
         if (usbMode.isChecked && (selectedUsb == null || !selectedUsb.isPresent() || receiverEndpoint == null || !selectedUsb.hasExclusivePeerRoute(receiverEndpoint.address))) {
             phase3PlanMessage = "USB not ready: enable USB tethering, refresh and explicitly select its local address, then enter the PC address on that link."
             renderPhase3(); return
         }
-        val plan = directModePlans.firstOrNull()
+        if (normalRun && receiverEndpoint == null) {
+            phase3Snapshot = phase3Snapshot.copy(state = "failed", message = "Select a PC in Settings or enter its IPv4 address.")
+            renderPhase3(); ensurePreview(); return
+        }
+        val plan = directModePlans.distinctBy { it.width to it.height }.getOrNull(modes.selectedItemPosition)
         if (plan == null) {
             phase3PlanMessage = "No direct hardware H.264 mode is available for this camera route. Review the plan notes."
             if (phase3Snapshot.finishedAt == null) {
@@ -374,7 +510,7 @@ class MainActivity : Activity() {
             renderPhase3()
             return
         }
-        if (phase3Snapshot.finishedAt != null && !runtimeReportExported) {
+        if (!normalRun && phase3Snapshot.finishedAt != null && !runtimeReportExported) {
             phase3PlanMessage = "Export the previous runtime JSON before starting another run."
             renderPhase3()
             return
@@ -411,7 +547,7 @@ class MainActivity : Activity() {
             onSnapshot = { snapshot ->
             phase3Snapshot = snapshot
             phase3PlanMessage = when (snapshot.state) {
-                "running" -> if (snapshot.transport != null) {
+                "running" -> if (normalRun) "Continuous streaming; stop when finished." else if (snapshot.transport != null) {
                     "The ten-minute RTP/H.264 run is active for " + snapshot.transport.destination + "."
                 } else "The five-minute direct-surface run is active."
                 "stopping" -> "The encoder is draining final output."
@@ -419,10 +555,17 @@ class MainActivity : Activity() {
                 else -> snapshot.message
             }
             renderPhase3()
+            if (snapshot.isTerminal) {
+                stopLanMonitor()
+                if (activityDestroyed) { previewSurface?.release(); previewSurface = null } else ensurePreview()
+            }
             },
             receiverEndpoint = receiverEndpoint,
-            usbLink = selectedUsb
+            usbLink = selectedUsb,
+            previewSurface = if (normalRun) previewSurface else null,
+            continuous = normalRun
         ).also { it.start() }
+        if (receiverEndpoint != null && selectedUsb == null) startLanMonitor(receiverEndpoint)
         renderPhase3()
     }
 
@@ -470,27 +613,29 @@ class MainActivity : Activity() {
             setBackgroundColor(0xFFFFFFFF.toInt())
         }
         panel.addView(TextView(this).apply {
-            text = "Camera to hardware encoder and RTP"
+            text = "Camera and connection settings"
             textSize = 17f
             setTextColor(0xFF182022.toInt())
             typeface = Typeface.DEFAULT_BOLD
         }, matchWrap())
         panel.addView(TextView(this).apply {
-            text = "Prepare permission-gated camera routes, then run the highest exact 30 fps mode shared by Camera2 and a hardware H.264 encoder. Find a local receiver with DNS-SD or enter a fixed IPv4 address. Capture-only runs stop after five minutes; LAN and USB runs stop after ten."
+            text = "Stop streaming to change camera, resolution or connection. USB: connect a cable and manually enable USB tethering in Android Settings. USB debugging is not required."
             textSize = 13f
             setTextColor(0xFF536164.toInt())
             setPadding(0, dp(4), 0, dp(8))
         }, matchWrap())
         phase3Routes = Spinner(this).apply { isEnabled = false }
         panel.addView(phase3Routes, matchWrap())
+        modes = Spinner(this)
+        panel.addView(modes, matchWrap())
         highResolutionTrial = android.widget.CheckBox(this).apply {
-            text = "High-resolution trial (largest supported mode up to 4K/30)"
-            setOnCheckedChangeListener { _, _ -> refreshPhase3Plans(selectedCameraRoute); renderPhase3() }
+            text = "Show experimental modes through 4K/30 (grain and drops remain unresolved)"
+            setOnCheckedChangeListener { _, _ -> refreshPhase3Plans(selectedCameraRoute); renderPhase3(); saveSettings() }
         }
         panel.addView(highResolutionTrial, matchWrap())
         exact1080Trial = android.widget.CheckBox(this).apply {
-            text = "1080p configuration trial (overrides 4K trial)"
-            setOnCheckedChangeListener { _, _ -> refreshPhase3Plans(selectedCameraRoute); renderPhase3() }
+            text = "Exact 1080p trial despite encoder metadata rejection (explicit opt-in)"
+            setOnCheckedChangeListener { _, _ -> refreshPhase3Plans(selectedCameraRoute); renderPhase3(); saveSettings() }
         }
         panel.addView(exact1080Trial, matchWrap())
         phase4ReceiverChoices = ArrayAdapter(
@@ -518,11 +663,12 @@ class MainActivity : Activity() {
         }
         panel.addView(phase4DiscoveryStatus, matchWrap())
         usbMode = android.widget.CheckBox(this).apply {
-            text = "USB Network Mode (unchecked = LAN / Wi-Fi)"
+            text = "USB Network Mode (off = Wireless)"
             setOnCheckedChangeListener { _, checked ->
                 if (checked) { stopReceiverDiscovery(); selectedDiscoveredReceiver = null }
                 usbStatus.text = if (checked) "Enable USB tethering manually. Refresh and confirm its local address; enter the Windows USB adapter IPv4 below." else "LAN / Wi-Fi selected."
                 renderPhase3()
+                saveSettings()
             }
         }
         panel.addView(usbMode, matchWrap())
@@ -533,13 +679,8 @@ class MainActivity : Activity() {
         panel.addView(usbStatus, matchWrap())
         usbPort = EditText(this).apply { hint = "USB media port"; setText("5004"); inputType = InputType.TYPE_CLASS_NUMBER; setSingleLine(true) }
         panel.addView(usbPort, matchWrap())
-        panel.addView(actionButton("Refresh USB network addresses") {
-            try {
-                usbCandidates = com.camsure.profiler.phase4.UsbNetworkLink.candidates(this)
-                usbAddresses.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, listOf("Select USB local address") + usbCandidates.map { it.toString() })
-                usbStatus.text = if (usbCandidates.isEmpty()) "USB network not available. Enable USB tethering and connect the device to the PC." else "Confirm the tethering interface; candidates are not proof of USB. Select explicitly, even if only one."
-            } catch (error: Exception) { usbStatus.text = "Network inventory failed: " + error.javaClass.simpleName }
-        }, matchWrap())
+        usbRefreshButton = actionButton("Refresh USB network addresses") { refreshUsbNetworks() }
+        panel.addView(usbRefreshButton, matchWrap())
         phase4ReceiverIp = EditText(this).apply {
             hint = "Optional fixed receiver IPv4 · blank = selected receiver or capture only"
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
@@ -552,8 +693,9 @@ class MainActivity : Activity() {
         preparePhase3Button = actionButton("Prepare camera routes") {
             requestCameraPermission(CameraAction.PREPARE_PHASE3)
         }
-        startPhase3Button = actionButton("Start highest direct mode · capture 5 min / stream 10 min") {
-            startPhase3Experiment()
+        startPhase3Button = actionButton("Run timed test · capture 5 min / stream 10 min") {
+            normalRun = false
+            stopPreview { startPhase3Experiment() }
         }.apply { isEnabled = false }
         stopPhase3Button = actionButton("Stop camera run") {
             stopPhase3Experiment()
@@ -561,17 +703,24 @@ class MainActivity : Activity() {
         exportPhase3Button = actionButton("Export runtime JSON") {
             openRuntimeReportPicker()
         }.apply { isEnabled = false }
-        panel.addView(preparePhase3Button, matchWrap())
-        panel.addView(startPhase3Button, matchWrap(dp(6)))
-        panel.addView(stopPhase3Button, matchWrap(dp(6)))
-        panel.addView(exportPhase3Button, matchWrap(dp(6)))
+        diagnostics = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; visibility = View.GONE }
+        panel.addView(actionButton("Diagnostics") { diagnostics.visibility = if (diagnostics.visibility == View.VISIBLE) View.GONE else View.VISIBLE }, matchWrap())
+        panel.addView(diagnostics, matchWrap())
+        for (v in listOf(scanButton, exportButton, settingsButton, statusText, reportText)) {
+            (v.parent as? android.view.ViewGroup)?.removeView(v)
+            diagnostics.addView(v, matchWrap())
+        }
+        diagnostics.addView(preparePhase3Button, matchWrap())
+        diagnostics.addView(startPhase3Button, matchWrap(dp(6)))
+        diagnostics.addView(stopPhase3Button, matchWrap(dp(6)))
+        diagnostics.addView(exportPhase3Button, matchWrap(dp(6)))
         phase3StatusText = TextView(this).apply {
             textSize = 13f
             setTextColor(0xFF31524F.toInt())
             setPadding(dp(2), dp(9), dp(2), dp(6))
             accessibilityLiveRegion = View.ACCESSIBILITY_LIVE_REGION_POLITE
         }
-        panel.addView(phase3StatusText, matchWrap())
+        diagnostics.addView(phase3StatusText, matchWrap())
         phase3ReportText = TextView(this).apply {
             textSize = 12f
             setTextColor(0xFF202A2C.toInt())
@@ -580,7 +729,7 @@ class MainActivity : Activity() {
             setPadding(dp(10), dp(10), dp(10), dp(10))
             setBackgroundColor(0xFFF5F6F7.toInt())
         }
-        panel.addView(phase3ReportText, matchWrap())
+        diagnostics.addView(phase3ReportText, matchWrap())
         phase3Routes.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 refreshPhase3Plans(null)
@@ -589,8 +738,11 @@ class MainActivity : Activity() {
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 val route = parent?.getItemAtPosition(position) as? CameraRoute
+                val changed = route != selectedCameraRoute
                 refreshPhase3Plans(route)
+                if (changed) stopPreview { ensurePreview() } else ensurePreview()
                 renderPhase3()
+                saveSettings()
             }
         }
         phase4DiscoveredReceivers.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -605,10 +757,95 @@ class MainActivity : Activity() {
                     phase4ReceiverIp.text.clear()
                 }
                 renderPhase3()
+                saveSettings()
             }
         }
+        arrangeSettings(panel)
         renderPhase3()
         return panel
+    }
+
+    private fun arrangeSettings(panel: LinearLayout) {
+        // Reuse the existing controls/listeners; only their presentation changes.
+        panel.removeAllViews()
+        panel.addView(settingsLabel("Settings", heading = true), matchWrap())
+        settingsNotice = settingsLabel("Changes are saved automatically.")
+        panel.addView(settingsNotice, matchWrap(dp(6)))
+        panel.addView(settingsLabel("Connection", heading = true), matchWrap(dp(20)))
+        wirelessOption = android.widget.RadioButton(this).apply { id = View.generateViewId(); text = "Wireless"; minHeight = dp(48) }
+        usbOption = android.widget.RadioButton(this).apply { id = View.generateViewId(); text = "USB Network"; minHeight = dp(48) }
+        connectionModes = android.widget.RadioGroup(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            addView(wirelessOption, LinearLayout.LayoutParams(0, -2, 1f))
+            addView(usbOption, LinearLayout.LayoutParams(0, -2, 1f))
+            check(wirelessOption.id)
+            setOnCheckedChangeListener { _, id ->
+                val selectedUsb = id == usbOption.id
+                if (usbMode.isChecked != selectedUsb) usbMode.isChecked = selectedUsb
+            }
+        }
+        panel.addView(connectionModes, matchWrap(dp(4)))
+
+        wirelessSettings = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        wirelessSettings.addView(settingsLabel("Keep the phone and PC on the same local network. Start the CamSure receiver on your PC, then find it below."), matchWrap(dp(6)))
+        addSettingsField(wirelessSettings, "OBS PC", phase4DiscoveredReceivers)
+        (phase4DiscoveryButton.parent as? android.view.ViewGroup)?.removeView(phase4DiscoveryButton)
+        wirelessSettings.addView(phase4DiscoveryButton, matchWrap(dp(6)))
+        (phase4DiscoveryStatus.parent as? android.view.ViewGroup)?.removeView(phase4DiscoveryStatus)
+        wirelessSettings.addView(phase4DiscoveryStatus, matchWrap())
+        panel.addView(wirelessSettings, matchWrap())
+
+        usbSettings = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        usbSettings.addView(settingsLabel("1. Connect the USB cable and enable USB tethering in Android Settings.\n2. Choose the phone's tethering interface/address.\n3. Enter the PC's USB adapter IPv4 below.\nUSB debugging is not required."), matchWrap(dp(6)))
+        addSettingsField(usbSettings, "Phone USB interface / address", usbAddresses)
+        usbSettings.addView(usbRefreshButton, matchWrap(dp(6)))
+        usbSettings.addView(usbStatus, matchWrap())
+        addSettingsField(usbSettings, "Media port · match the PC receiver", usbPort)
+        panel.addView(usbSettings, matchWrap())
+
+        phase4ReceiverIp.hint = "e.g. 192.168.1.10"
+        pcAddressLabel = settingsLabel("PC IPv4 · manual fallback")
+        if (phase4ReceiverIp.id == View.NO_ID) phase4ReceiverIp.id = View.generateViewId()
+        pcAddressLabel.labelFor = phase4ReceiverIp.id
+        panel.addView(pcAddressLabel, matchWrap(dp(12)))
+        panel.addView(phase4ReceiverIp, matchWrap(dp(4)))
+
+        panel.addView(settingsLabel("Camera", heading = true), matchWrap(dp(20)))
+        addSettingsField(panel, "Camera / lens", phase3Routes)
+        addSettingsField(panel, "Resolution · 30 fps", modes)
+        resolutionHint = settingsLabel("Only eligible modes for this camera are shown.")
+        panel.addView(resolutionHint, matchWrap(dp(6)))
+
+        // Trials remain opt-in, beneath the existing Diagnostics entry point.
+        diagnostics.addView(highResolutionTrial, 0, matchWrap())
+        diagnostics.addView(exact1080Trial, 1, matchWrap())
+        diagnostics.addView(settingsLabel("Trials do not guarantee runtime support. Exact 1080p does not override metadata for other modes. 4K remains experimental. Leave Wireless PC selection/address blank for a capture-only timed test."), 2, matchWrap(dp(6)))
+        panel.addView(actionButton("Diagnostics ▸") {
+            diagnostics.visibility = if (diagnostics.visibility == View.VISIBLE) View.GONE else View.VISIBLE
+        }, matchWrap(dp(20)))
+        panel.addView(diagnostics, matchWrap(dp(6)))
+    }
+
+    private fun settingsLabel(label: String, heading: Boolean = false) = TextView(this).apply {
+        text = label
+        textSize = if (heading) 18f else 13f
+        setTextColor(if (heading) 0xFF182022.toInt() else 0xFF536164.toInt())
+        if (heading) typeface = Typeface.DEFAULT_BOLD
+    }
+
+    private fun addSettingsField(parent: LinearLayout, label: String, field: View) {
+        (field.parent as? android.view.ViewGroup)?.removeView(field)
+        if (field.id == View.NO_ID) field.id = View.generateViewId()
+        parent.addView(settingsLabel(label).apply { labelFor = field.id }, matchWrap(dp(12)))
+        parent.addView(field, matchWrap(dp(4)))
+    }
+
+    private fun validateSettingsInputs() {
+        val address = phase4ReceiverIp.text.toString().trim()
+        phase4ReceiverIp.error = if (address.isNotEmpty() && FixedReceiverEndpoint.parseIPv4(address) == null)
+            "Enter a numeric IPv4 address, such as 192.168.1.10." else null
+        val port = usbPort.text.toString().toIntOrNull()
+        usbPort.error = if (usbMode.isChecked && (port == null || port !in 1..65535)) "Use a port from 1 to 65535." else null
     }
 
     private fun toggleReceiverDiscovery() {
@@ -635,6 +872,7 @@ class MainActivity : Activity() {
         receiverDiscovery?.close()
         receiverDiscovery = null
         if (!::phase4ReceiverChoices.isInitialized || activityDestroyed) return
+        selectedDiscoveredReceiver?.let { if (phase4ReceiverIp.text.isBlank()) phase4ReceiverIp.setText(it.endpoint.address.hostAddress) }
         discoveredReceivers = emptyList()
         selectedDiscoveredReceiver = null
         setReceiverChoices(emptyList(), null)
@@ -644,9 +882,11 @@ class MainActivity : Activity() {
 
     private fun updateDiscoveredReceivers(receivers: List<DiscoveredReceiver>, message: String) {
         if (activityDestroyed || !::phase4ReceiverChoices.isInitialized) return
-        val previousName = selectedDiscoveredReceiver?.serviceName
+        val previous = selectedDiscoveredReceiver
+        val previousName = previous?.serviceName
         discoveredReceivers = receivers
         selectedDiscoveredReceiver = receivers.firstOrNull { it.serviceName == previousName }
+        if (previous != null && selectedDiscoveredReceiver == null && phase4ReceiverIp.text.isBlank()) phase4ReceiverIp.setText(previous.endpoint.address.hostAddress)
         setReceiverChoices(receivers, selectedDiscoveredReceiver)
         phase4DiscoveryStatus.text = message
         renderPhase3()
@@ -673,11 +913,13 @@ class MainActivity : Activity() {
         exact1080Trial.isEnabled = !active
         phase4DiscoveredReceivers.isEnabled = !active && discoveredReceivers.isNotEmpty()
         phase4DiscoveryButton.text = if (receiverDiscovery?.isRunning == true) {
-            "Stop receiver discovery"
+            "Stop searching"
         } else {
-            "Find receivers on local network"
+            "Find PCs"
         }
         usbPort.isEnabled = !active && usbMode.isChecked
+        usbRefreshButton.isEnabled = !active && usbMode.isChecked
+        phase4DiscoveryButton.isEnabled = !active && !usbMode.isChecked
         usbMode.isEnabled = !active
         usbAddresses.isEnabled = !active && usbMode.isChecked
         phase4ReceiverIp.isEnabled = !active
@@ -695,7 +937,23 @@ class MainActivity : Activity() {
         } else ""
         phase3StatusText.text = listOf(phase3Snapshot.message, phase3PlanMessage, exportReminder)
             .filter { it.isNotBlank() }.distinct().joinToString("\n")
+        modes.isEnabled = !active
+        if (::connectionModes.isInitialized) {
+            wirelessOption.isEnabled = !active
+            usbOption.isEnabled = !active
+            connectionModes.check(if (usbMode.isChecked) usbOption.id else wirelessOption.id)
+            wirelessSettings.visibility = if (usbMode.isChecked) View.GONE else View.VISIBLE
+            usbSettings.visibility = if (usbMode.isChecked) View.VISIBLE else View.GONE
+            pcAddressLabel.text = if (usbMode.isChecked) "PC USB adapter IPv4 · required" else "PC IPv4 · manual fallback"
+            settingsNotice.text = if (active) "Streaming is active. Stop on the camera screen to change these settings." else "Changes are saved automatically. Tap Done to return to the camera."
+            resolutionHint.text = if (directModePlans.isEmpty()) "No eligible encoder mode found. Open Diagnostics to inspect or retry."
+                else if (directModePlans.first().cameraAdvertises1080p && directModePlans.none { it.width == 1920 && it.height == 1080 })
+                    "1080p is camera-advertised but encoder metadata rejects it. The explicit trial is in Diagnostics."
+                else "Eligible modes for this camera. Experimental options are in Diagnostics."
+        }
         phase3ReportText.text = renderPhase3Snapshot(phase3Snapshot, directModePlans)
+        renderHome()
+        ensurePreview()
     }
 
     private fun renderPhase3Snapshot(snapshot: ExperimentSnapshot, plans: List<DirectModePlan>): String = buildString {
@@ -786,10 +1044,177 @@ class MainActivity : Activity() {
         appendLine("GPU utilization is not exposed by the public app APIs used here.")
     }
 
+    private fun isStreamActive() = phase3Experiment != null && com.camsure.profiler.session.CameraRunPolicy.active(phase3Snapshot.state)
+
+    private fun showSettings(show: Boolean) {
+        settingsOpen = show
+        settingsPage.visibility = if (show) View.VISIBLE else View.GONE
+    }
+
+    @Deprecated("Platform back navigation for API 26")
+    @android.annotation.SuppressLint("GestureBackNavigation") // API 33+ uses the registered platform callback.
+    override fun onBackPressed() {
+        leaveSettingsOrFinish()
+    }
+
+    private fun leaveSettingsOrFinish() {
+        if (settingsOpen) { saveSettings(); showSettings(false); ensurePreview() } else finish()
+    }
+
+    private fun saveSettings() {
+        if (!settingsLoaded || !::modes.isInitialized) return
+        val address = phase4ReceiverIp.text.toString().trim()
+        val editor = prefs.edit().putBoolean("usb", usbMode.isChecked)
+            .putBoolean("experimental4k", highResolutionTrial.isChecked).putBoolean("exact1080", exact1080Trial.isChecked)
+        if (address.isBlank() || FixedReceiverEndpoint.parseIPv4(address) != null) editor.putString("address", address)
+        usbPort.text.toString().toIntOrNull()?.takeIf { it in 1..65535 }?.let { editor.putString("port", it.toString()) }
+        selectedCameraRoute?.let { editor.putString("route", it.cameraId + ":" + it.physicalCameraId) }
+        directModePlans.distinctBy { it.width to it.height }.getOrNull(modes.selectedItemPosition)?.let {
+            editor.putString("resolution", "${it.width}x${it.height}")
+        }
+        selectedDiscoveredReceiver?.let {
+            editor.putString("address", it.endpoint.address.hostAddress)
+            editor.putString("discoveredAddress", it.endpoint.address.hostAddress)
+            editor.putInt("discoveredPort", it.endpoint.port)
+        }
+        usbCandidates.getOrNull(usbAddresses.selectedItemPosition - 1)?.let { editor.putString("usbLocal", it.toString() + ":" + it.interfaceIndex) }
+        editor.apply()
+    }
+
+    private fun renderHome() {
+        if (!::homeStatus.isInitialized) return
+        val active = isStreamActive()
+        homeStart.text = if (active) "Stop" else if (permissionMessage != null) "Allow Camera" else "Start"
+        homeStart.isEnabled = phase3Snapshot.state != "stopping" && !previewStopping
+        homeStatus.text = permissionMessage ?: when {
+            phase3Snapshot.state == "failed" -> "Connection failure: ${phase3Snapshot.message}"
+            phase3Snapshot.transport?.state == "send_error" -> "Connection failure: UDP send error. Stop, check the network and restart."
+            phase3Snapshot.state == "running" && phase3Snapshot.transport == null -> "Timed camera test · preview resumes when stopped."
+            phase3Snapshot.state == "running" && phase3Snapshot.encodedFrames > 0 -> "Streaming · ${phase3Snapshot.transport?.destination ?: "timed capture"}\nSender active; check OBS for reception."
+            active -> if (phase3Snapshot.state == "stopping") "Stopping…" else "Connecting…"
+            else -> "Stopped · ${if (usbMode.isChecked) "USB Network Mode" else "Wireless"}" +
+                if (phase3PlanMessage.startsWith("Enter") || phase3PlanMessage.startsWith("USB not ready") || phase3PlanMessage.startsWith("No direct")) "\nConnection failure: $phase3PlanMessage"
+                else if (phase3Snapshot.state == "stopped") "\n${phase3Snapshot.message}" else ""
+        }
+    }
+
+    private fun stopPreview(then: (() -> Unit)? = null) {
+        if (previewRun == null && !previewStopping) { then?.invoke(); return }
+        afterPreviewStop = then
+        if (!previewStopping) { previewStopping = true; previewRun?.stopByUser() }
+        renderHome()
+    }
+
+    private fun ensurePreview() {
+        if (!foreground || activityDestroyed || !::preview.isInitialized || !preview.isAvailable ||
+            previewRun != null || previewStopping || isStreamActive() ||
+            checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) return
+        val route = selectedCameraRoute ?: return
+        try {
+            val manager = getSystemService(android.hardware.camera2.CameraManager::class.java)
+            val info = manager.getCameraCharacteristics(route.characteristicsCameraId)
+            val sizes = info.get(android.hardware.camera2.CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
+                ?.getOutputSizes(android.graphics.SurfaceTexture::class.java).orEmpty()
+            previewSize = sizes.filter { it.width <= 1280 && it.height <= 720 }.maxByOrNull { it.width * it.height }
+                ?: sizes.minByOrNull { it.width * it.height } ?: return
+            preview.surfaceTexture?.setDefaultBufferSize(previewSize.width, previewSize.height)
+            previewSurface?.release()
+            previewSurface = android.view.Surface(preview.surfaceTexture)
+            transformPreview()
+            val ranges = info.get(android.hardware.camera2.CameraCharacteristics.CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES).orEmpty()
+            val fps = ranges.firstOrNull { it.upper == 30 } ?: ranges.firstOrNull() ?: return
+            val plan = DirectModePlan(previewSize.width, previewSize.height, "preview", 1, 1, 0, "preview", 0, fps, false, false, emptyList())
+            previewRun = CameraToEncoderExperiment(this, route, plan, { snapshot ->
+                if (snapshot.isTerminal) {
+                    previewRun = null; previewStopping = false
+                    val continuation = afterPreviewStop; afterPreviewStop = null
+                    renderHome()
+                    if (snapshot.state == "failed") homeStatus.text = "Preview unavailable: ${snapshot.message}"
+                    if (activityDestroyed) { previewSurface?.release(); previewSurface = null }
+                    if (continuation != null) continuation() else if (snapshot.state != "failed") ensurePreview()
+                }
+            }, previewSurface = previewSurface, previewOnly = true)
+            previewRun?.start()
+        } catch (error: Exception) { homeStatus.text = "Preview unavailable: ${error.message}" }
+    }
+
+    private fun transformPreview() {
+        val route = selectedCameraRoute ?: return
+        val info = getSystemService(android.hardware.camera2.CameraManager::class.java).getCameraCharacteristics(route.characteristicsCameraId)
+        val sensor = info.get(android.hardware.camera2.CameraCharacteristics.SENSOR_ORIENTATION) ?: 0
+        @Suppress("DEPRECATION")
+        val rotation = windowManager.defaultDisplay.rotation * 90
+        if (preview.width == 0 || preview.height == 0) return
+        val geometry = PreviewGeometry.centerCrop(preview.width, preview.height,
+            previewSize.width, previewSize.height, sensor, rotation)
+        val centerX = preview.width / 2f; val centerY = preview.height / 2f
+        val matrix = android.graphics.Matrix()
+        matrix.setScale(geometry.scaleX, geometry.scaleY, centerX, centerY)
+        matrix.postRotate(geometry.rotationDegrees, centerX, centerY)
+        preview.setTransform(matrix)
+    }
+
+    @Suppress("DEPRECATION") // API 26+ inventory includes local Wi-Fi without internet validation.
+    private fun startLanMonitor(endpoint: FixedReceiverEndpoint) {
+        stopLanMonitor()
+        val cm = getSystemService(android.net.ConnectivityManager::class.java)
+        val selected = cm.allNetworks.firstOrNull { network ->
+            val caps = cm.getNetworkCapabilities(network)
+            caps != null && (caps.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI) ||
+                caps.hasTransport(android.net.NetworkCapabilities.TRANSPORT_ETHERNET)) &&
+                cm.getLinkProperties(network)?.routes?.any { it.matches(endpoint.address) } == true
+        }
+        val owner = phase3Experiment
+        if (selected == null) { owner?.stopForLinkLoss(); return }
+        val localAddresses = cm.getLinkProperties(selected)?.linkAddresses
+        lanMonitor = object : android.net.ConnectivityManager.NetworkCallback() {
+            override fun onLost(network: android.net.Network) {
+                if (network == selected) runOnUiThread { owner?.stopForLinkLoss() }
+            }
+            override fun onLinkPropertiesChanged(network: android.net.Network, properties: android.net.LinkProperties) {
+                if (network == selected && (properties.linkAddresses != localAddresses || properties.routes.none { it.matches(endpoint.address) }))
+                    runOnUiThread { owner?.stopForLinkLoss() }
+            }
+        }.also { callback ->
+            val wifi = cm.getNetworkCapabilities(selected)?.hasTransport(android.net.NetworkCapabilities.TRANSPORT_WIFI) == true
+            try {
+                cm.registerNetworkCallback(android.net.NetworkRequest.Builder().addTransportType(
+                    if (wifi) android.net.NetworkCapabilities.TRANSPORT_WIFI else android.net.NetworkCapabilities.TRANSPORT_ETHERNET
+                ).build(), callback)
+            } catch (_: Exception) { owner?.stopForLinkLoss() }
+        }
+    }
+
+    private fun stopLanMonitor() {
+        lanMonitor?.let { callback ->
+            try { getSystemService(android.net.ConnectivityManager::class.java).unregisterNetworkCallback(callback) } catch (_: Exception) {}
+        }
+        lanMonitor = null
+    }
+
+    private fun refreshUsbNetworks() {
+        if (isStreamActive()) return
+        try {
+            usbCandidates = com.camsure.profiler.phase4.UsbNetworkLink.candidates(this)
+            usbAddresses.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item,
+                listOf("Select USB local address") + usbCandidates.map { it.toString() })
+            val restored = com.camsure.profiler.session.CameraRunPolicy.restoredIndex(
+                usbCandidates.map { it.toString() + ":" + it.interfaceIndex }, prefs.getString("usbLocal", null))
+            usbAddresses.setSelection(restored?.plus(1) ?: 0)
+            usbStatus.text = if (usbCandidates.isEmpty()) "Enable USB tethering and connect the PC. USB debugging is not required."
+                else "Confirm the tethering interface/address. Changed or missing selections require explicit reselection."
+        } catch (error: Exception) { usbStatus.text = "Network inventory failed: ${error.javaClass.simpleName}" }
+    }
+
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+        preview.post { transformPreview() }
+    }
+
     private fun number(value: Double?): String = value?.let { String.format("%.2f", it) } ?: "—"
 
     private data class ReceiverChoice(val receiver: DiscoveredReceiver?) {
-        override fun toString(): String = receiver?.displayName ?: "Select a discovered receiver"
+        override fun toString(): String = receiver?.displayName ?: "Select a PC or enter its address below"
     }
 
     private fun runtimeReportFileName(): String {
@@ -982,6 +1407,19 @@ class MainActivity : Activity() {
         gravity = Gravity.CENTER
         minHeight = dp(48)
         setOnClickListener { action() }
+    }
+
+    private fun overlayButton(label: String, action: () -> Unit) = actionButton(label, action).apply {
+        background = null
+        stateListAnimator = null
+        elevation = 0f
+        minWidth = dp(48)
+        setPadding(dp(16), dp(8), dp(16), dp(8))
+        setTextColor(android.content.res.ColorStateList(
+            arrayOf(intArrayOf(-android.R.attr.state_enabled), intArrayOf()),
+            intArrayOf(0x80FFFFFF.toInt(), android.graphics.Color.WHITE)
+        ))
+        setShadowLayer(dp(2).toFloat(), 0f, dp(1).toFloat(), android.graphics.Color.BLACK)
     }
 
     private fun matchWrap(topMargin: Int = 0) = LinearLayout.LayoutParams(

@@ -13,6 +13,30 @@ step. The authorized shared 4K decoder trial above subsequently expanded the bou
 
 This file records decisions that should not drift silently.
 
+## D-023 — Preview-first Android operation using the existing camera owner
+
+**Status: ACTIVE implementation; physical acceptance OPEN (2026-10-01).**
+
+Reuse CameraToEncoderExperiment for preview-only and camera-to-encoder sessions.
+Normal streaming adds a bounded-size TextureView Surface to the same Camera2
+session as the unchanged encoder target. No second camera pipeline or CPU raw
+frame queue. Encoder-only Diagnostics retains the old five/ten-minute runs;
+operator Start has no automatic deadline. Settings navigation is an in-activity
+overlay retaining the preview Surface; restart-dependent edits stay disabled
+through teardown. Backgrounding stops capture/streaming; return opens preview
+but requires explicit Start. Rotation retains the session.
+
+Save capability-validated camera/mode choices and valid endpoint selections.
+Restore a USB selection only by exact interface/address/prefix/index identity;
+always repeat presence/exclusive-route/bind validation. No inferred USB identity,
+Wi-Fi band, automatic resolution or metadata-wide bypass. Exact 1080p remains
+an explicit trial, 4K experimental. Receiver command and transport-neutral native
+OBS boundary remain unchanged. UDP sender state cannot attest PC reception.
+
+This supersedes only D-020's historical launch-permission/no-preview UI behavior;
+its metadata profiler and evidence rules are retained. Physical session-combination,
+orientation, lifecycle and performance qualification remains open.
+
 Status values:
 
 - `ACTIVE`
