@@ -120,3 +120,20 @@ contains opt-in trials, timed validation and JSON export. Repeat navigation duri
 streaming and compare accepted 720p/1080p OBS behavior. Physical acceptance OPEN.
 
 Settings UX APK: SHA256 12A7CD8FFD7DD9CB5B70B76C07DF0B4CA95DC2848CD24526605194AECEE7862A. assembleDebug, all 13 unit tests and lintDebug passed. Log: evidence/2026-10-01-settings-ux-build-tests.log. Physical checks remain OPEN.
+
+## 2026-10-01 — Compact camera overlay and expandable tools
+
+Camera screen status no longer exposes receiver IP or raw connection setup details.
+It retains Start/Stop and a transparent, accessible tools icon. Tap the icon to
+reveal Settings; tap again or press Back to collapse. Opening Settings collapses
+tools and preserves the stream. Connection/address fields and actionable errors
+remain on Settings. Streaming status says to check OBS, preserving the distinction
+between sender activity and PC reception. Tools currently contains Settings only;
+zoom, torch and camera-switch controls on Android/OBS are the next slice.
+
+Build/device proof is recorded separately. Physical checks: expand/collapse over
+bright/dark scenes, Back behavior, tools/Settings navigation during streaming,
+Start/Stop, no IP on main, visible setup failures in Settings, and unchanged
+accepted 720p/1080p OBS framing/smoothness. No camera/encoder/transport changes.
+
+Compact tools APK SHA256: 3719634888E9790AFA016B6AC6F1FBEC1989AC54267C13E5F486E4AE45572DFB. assembleDebug, all 13 unit tests and lintDebug passed. Log: docs/evidence/2026-10-01-camera-tools-ui-build-tests.log. Physical UI/streaming acceptance remains OPEN.

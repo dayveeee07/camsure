@@ -1,5 +1,27 @@
 # DECISIONS.md
 
+## D-024 — Per-source OBS ownership of the existing Windows receiver
+
+**Status: ACTIVE implementation; physical/frontend acceptance OPEN (2026-10-01).**
+
+Keep the existing receiver executable and transport-neutral AU/decoder boundary.
+Managed reception is an opt-in source setting so existing external receiver scenes
+retain their behavior. Start launches the packaged executable directly, hidden,
+without a shell. Each source owns its worker, ready/stop events, restricted inherited
+I/O handles and kill-on-close job; source destruction/OBS exit cleans its receiver.
+Stop requests graceful teardown with a three-second forced-cleanup fallback.
+No shared global camera/receiver and no automatic startup after scene load.
+
+Persist explicit adapter/address/prefix, mode, port and USB peer in OBS settings.
+Validate selection against live inventory at Start; never substitute an absent
+adapter. USB retains existing subnet/peer filtering and tested 256 KiB receive
+buffer; selected-link loss ends the epoch without fallback. Managed LAN advertises
+only its selected bind endpoint. Bounded diagnostics and recent decoded-video
+timestamps distinguish waiting from streaming; stale video alone is not proof of
+network failure. Existing CLI defaults/timed tests remain compatible. A Windows
+x64 .NET 10 runtime is required by this framework-dependent local package.
+No remote camera controls, audio, new decoder or multicamera qualification.
+
 2026-10-01 follow-up: after real Xiaomi 4K encode proof, the user authorized
 extending shared native decode through 3840×2160 for a USB-to-OBS trial.
 Normal mode defaults remain unchanged; this is not production qualification.
@@ -399,3 +421,5 @@ and subnets alone do not. See USB_NETWORK_REPORT.md and USB_NETWORK_TESTING.md.
 Platform binding uses the public [Android DatagramSocket API](https://developer.android.com/reference/java/net/DatagramSocket).
 API 36 exposes [tethered-interface callbacks](https://developer.android.com/reference/android/net/TetheringManager.TetheringEventCallback);
 this API 26+ slice uses operator selection and interface monitoring throughout.
+
+D-024 clarification (2026-10-01): managed Start assigns a UUID-based pipe for inherited or automatic settings; source duplication re-identifies that automatic pipe. Explicit custom pipes and external receiver defaults remain supported. This closes the demonstrated default-pipe collision, not physical multicamera qualification.

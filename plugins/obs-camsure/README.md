@@ -1,5 +1,20 @@
 # CamSure native OBS plugin
 
+## Connection setup inside OBS
+
+Enable **Manage receiver in OBS (no PowerShell)** in CamSure Camera properties.
+Select Wireless or USB Network, choose the explicit PC adapter/IPv4 and port,
+and in USB mode enter the phone tethering IPv4. Click Start receiver, then Start
+on Android. Stop and status are available in the same source properties; connection
+edits are locked while active. Saved settings restore, but reception starts explicitly.
+Existing external receiver scenes remain compatible. Detailed setup and separate
+physical acceptance: ../../docs/OBS_CONNECTION_TESTING.md.
+
+Before native build/stage, run `./package-receiver.ps1` from this directory to
+publish the existing receiver into `data/receiver`. Normal users need Windows x64
+.NET 10 runtime, but no SDK or PowerShell. Install the entire staged folder with
+OBS closed. This local framework-dependent package is not a public installer.
+
 Registers **CamSure Camera**, with independent per-instance diagnostic output.
 The optional **Real camera video** mode receives transport-neutral H.264 access
 units through a local named pipe, decodes with FFmpeg, and submits owned I420

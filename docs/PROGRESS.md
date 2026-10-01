@@ -1,5 +1,30 @@
 # PROGRESS.md
 
+## 2026-10-01 — OBS connection usability / managed receiver
+
+**Status: implemented; source/build/host tests PASS; physical/frontend acceptance OPEN.**
+CamSure source now offers opt-in receiver ownership, Wireless/USB selection, explicit
+PC adapter/address, media port, USB phone peer, Start/Stop and clear readiness/video/
+failure status. OBS settings persist; restart requires explicit Start. Active fields
+are locked, detailed output stays in Diagnostics, and old external receiver commands
+remain available. Direct hidden process launch, graceful events, bounded output,
+selected-link monitoring and kill-on-close jobs clean up per source. Managed LAN
+advertises only the selected bind address. USB preserves fail-closed selection and
+the measured trial's 256 KiB receive buffer. No new pipeline or remote controls.
+
+Native MSVC build/.NET Release publish pass. Real process tests pass readiness,
+collision isolation, graceful Stop, five cleanup/restart cycles and invalid settings.
+Real libobs/D3D11 tests pass three managed Start/Stop cycles, field locks, USB/LAN
+visibility, save/load and removal cleanup; original four-source diagnostics pass.
+Existing receiver tests pass. Shared video regression passes 720p/1080p exact PTS,
+142 distinct synthetic OBS frames, loss/restart and idle/partial-read removal x10.
+Synthetic 4K decoder output still does not qualify real 4K. Logs: evidence/2026-10-01-obs-*.
+
+The staged package includes its receiver under data/receiver and requires Windows
+x64 .NET 10 runtime. OBS frontend layout, real phone Wireless/USB, link-loss, sustained
+smoothness/latency and application restart remain separate physical checks in
+[OBS connection checklist](OBS_CONNECTION_TESTING.md). No commits/push in this slice.
+
 This file tracks verified implementation status.
 
 ## 2026-10-01: Transparent camera controls
@@ -1453,3 +1478,81 @@ Diagnostics. Active-session locks explain how to change settings. Physical UX
 acceptance remains open; no receiver/native OBS changes.
 
 Settings follow-up source proof: assembleDebug, 13 unit tests and lintDebug passed; evidence/2026-10-01-settings-ux-build-tests.log. Physical checks remain separate and open.
+
+## Installed package proof — 2026-10-01
+
+Installed with OBS closed at C:/ProgramData/obs-studio/plugins/obs-camsure/.
+All installed files match stage; evidence/2026-10-01-obs-connection-install-hashes.txt.
+Native DLL SHA256: 68E06847E6940D137B2CFBE3719BE719F96126648063540C5A04744F7AC3DEF3.
+Receiver DLL SHA256: 12AB2D1A1C8FFD19A6ACE5CC8CBB842C7C40999F82EA30ABDC936F7CDB1C7409.
+Prior package backup: plugins/obs-camsure/build_vs2026/install-backups/20261001-connection-setup/.
+The actual installed DLL/data package passed the managed libobs source probe:
+evidence/2026-10-01-obs-installed-managed-source-tests.log. No receiver process
+remained after tests. .NET 10.0.5 x64 runtime is installed. OBS frontend/physical
+phone acceptance remains OPEN; no scene collection/profile was changed.
+
+## 2026-10-01 — Compact camera overlay and expandable tools
+
+Camera screen status no longer exposes receiver IP or raw connection setup details.
+It retains Start/Stop and a transparent, accessible tools icon. Tap the icon to
+reveal Settings; tap again or press Back to collapse. Opening Settings collapses
+tools and preserves the stream. Connection/address fields and actionable errors
+remain on Settings. Streaming status says to check OBS, preserving the distinction
+between sender activity and PC reception. Tools currently contains Settings only;
+zoom, torch and camera-switch controls on Android/OBS are the next slice.
+
+Build/device proof is recorded separately. Physical checks: expand/collapse over
+bright/dark scenes, Back behavior, tools/Settings navigation during streaming,
+Start/Stop, no IP on main, visible setup failures in Settings, and unchanged
+accepted 720p/1080p OBS framing/smoothness. No camera/encoder/transport changes.
+
+Compact tools APK SHA256: 3719634888E9790AFA016B6AC6F1FBEC1989AC54267C13E5F486E4AE45572DFB. assembleDebug, all 13 unit tests and lintDebug passed. Log: docs/evidence/2026-10-01-camera-tools-ui-build-tests.log. Physical UI/streaming acceptance remains OPEN.
+
+## 2026-10-01 — Second managed OBS source startup fix
+
+Confirmed current OBS log (2026-10-01 19-05-58.txt, errors from 19:50:18 onward):
+"AU pipe unavailable (another source may own this name)". Saved CamSure Camera 2
+has a separate media port (5010), but both sources lack an explicit au_pipe setting
+and inherit camsure-camera-1. The decoder pipe conflict blocks the second source.
+
+Managed Start now assigns and saves camsure-auto-<OBS source UUID> when the pipe
+is inherited or already automatic. A duplicated automatic source derives its own
+UUID-based pipe; a saved/restored source retains its identity. Explicit custom pipe
+settings and external receiver defaults remain intact. Media ports must still be
+unique on the same PC adapter; no automatic retargeting or scene-file editing.
+
+Native build/stage and real concurrent-receiver libobs test pass: two independent
+owners, separate automatic pipes, Stop/restart isolation, duplicate isolation,
+save/load and cleanup. Existing explicit-pipe managed-source test passes. See
+2026-10-01-obs-managed-pair-regression.log and related fix logs in docs/evidence.
+This is host ownership proof; simultaneous real-phone quality/latency remains OPEN.
+The corrected package is staged pending replacement with OBS closed. No commit/push.
+
+Installed second-source fix with OBS verified closed (2026-10-01).
+All package hashes match stage; native DLL SHA256:
+C8268C6A1A7F95CD4F2BC5C7F0D1EED6381B82F81C270E7A558802A77DB37B81.
+Proof: evidence/2026-10-01-obs-default-pipe-fix-install-hashes.txt.
+Backup: plugins/obs-camsure/build_vs2026/install-backups/20261001-default-pipe-fix/.
+Shared synthetic video regression passes with 157 distinct frames; explicit-pipe
+managed regression remains passing. No OBS scene/profile edits. Physical retest:
+start both saved sources (ports 5004 and 5010), select the matching discovered
+endpoint on each phone, verify independent images and Stop/restart isolation.
+
+2026-10-01 user follow-up: "now working!" after installing the managed pipe fix.
+Record this as user-reported functional success for the second-source startup.
+Phone/tablet rear resolution selections differ (phone offers 720p, tablet 1080p);
+current metadata filtering and opt-in exact-1080p path remain in place. No paired
+multi-phone counters, duration, latency or sustained independence measurements
+were supplied; broader multicamera qualification remains open.
+
+2026-10-01 two-source visible-drop follow-up: user supplied Xiaomi continuous LAN
+720p30 preview-inclusive837.385s report. Capture/encoder approximately30.0069fps,
+25119AUs/335621packets sent, zero reported capture/encode/sender drops or failures.
+Matching720p OBS pipe decoded22692 and submitted16227; at least6456 latest-slot
+replacements and126 recovery resets, with zero native decode errors/stale drops.
+Visible smoothness acceptance FAIL/user-observed drops; source startup success
+remains separate. Wi-Fi band UNCONFIRMED (user guesses2.4GHz). Missing receiver
+SSRC/gap/bridge counters prevent assigning all discrepancies to packet loss.
+See evidence/2026-10-01-two-camera-visible-drops-analysis.md and preserved JSON/
+CamSure-only OBS excerpt. Isolate verified5GHz single-device versus two-device
+runs before changing buffering or adding controls. No implementation change here.

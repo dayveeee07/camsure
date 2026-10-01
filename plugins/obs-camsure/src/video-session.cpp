@@ -57,7 +57,7 @@ VideoSession::VideoSession(obs_source_t *s, std::string name) : source(s), pipe_
 VideoSession::~VideoSession() { stop.store(true); if (worker.joinable()) worker.join(); }
 void VideoSession::present()
 {
- if (clear_output.exchange(false)) obs_source_output_video(source, nullptr);
+ if (clear_output.exchange(false)) { last_presented.store(0); obs_source_output_video(source, nullptr); }
  std::optional<PendingFrame> pending;
  { std::lock_guard<std::mutex> lock(frame_mutex); pending.swap(latest); }
  if (!pending) return;
@@ -74,6 +74,7 @@ void VideoSession::present()
  output.full_range = frame.full_range;
  const int64_t before = qpc();
  obs_source_output_video(source, &output); // libobs copies planes synchronously
+ last_presented.store(os_gettime_ns());
  ++submitted; max_output_ms.store(std::max(max_output_ms.load(), milliseconds(qpc() - before)));
 }
 void VideoSession::run() noexcept
@@ -175,7 +176,7 @@ void VideoSession::run() noexcept
    clear_output.store(true);
    DisconnectNamedPipe(pipe.value);
   }
- } catch (const std::exception &error) { blog(LOG_ERROR, "[CamSure] Video session stopped: %s", error.what()); }
+ } catch (const std::exception &error) { failed.store(true); blog(LOG_ERROR, "[CamSure] Video session stopped: %s", error.what()); }
  clear_output.store(true);
  blog(LOG_INFO, "[CamSure] Video stopped pipe=%s input=%llu decoded=%llu submitted=%llu dropped=%llu resets=%llu errors=%llu",
   pipe_name.c_str(), (unsigned long long)inputs, (unsigned long long)decoded, (unsigned long long)submitted.load(), (unsigned long long)drops, (unsigned long long)resets, (unsigned long long)errors);

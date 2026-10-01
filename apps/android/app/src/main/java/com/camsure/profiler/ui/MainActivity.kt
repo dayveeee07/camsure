@@ -93,6 +93,8 @@ class MainActivity : Activity() {
     private var foreground = false
     private var normalRun = false
     private lateinit var homeStatus: TextView
+    private lateinit var cameraTools: LinearLayout
+    private lateinit var cameraToolsButton: Button
     private lateinit var homeStart: Button
     private lateinit var settingsPage: ScrollView
     private lateinit var modes: Spinner
@@ -216,6 +218,20 @@ class MainActivity : Activity() {
             textSize = 28f
             setPadding(0, 0, 0, 0)
         }
+        cameraTools = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            visibility = View.GONE
+            addView(gear, LinearLayout.LayoutParams(dp(56), dp(56)))
+        }
+        cameraToolsButton = overlayButton("⋮") {
+            val show = cameraTools.visibility != View.VISIBLE
+            cameraTools.visibility = if (show) View.VISIBLE else View.GONE
+            cameraToolsButton.contentDescription = if (show) "Hide camera tools" else "Show camera tools"
+        }.apply {
+            textSize = 32f
+            contentDescription = "Show camera tools"
+            setPadding(0, 0, 0, 0)
+        }
         preview = android.view.TextureView(this).apply {
             surfaceTextureListener = object : android.view.TextureView.SurfaceTextureListener {
                 override fun onSurfaceTextureAvailable(texture: android.graphics.SurfaceTexture, width: Int, height: Int) { ensurePreview() }
@@ -252,7 +268,8 @@ class MainActivity : Activity() {
             }
         }
         footer.addView(homeStart, LinearLayout.LayoutParams(-2, dp(56)).apply { gravity = Gravity.CENTER_HORIZONTAL })
-        home.addView(gear, FrameLayout.LayoutParams(dp(56), dp(56), Gravity.TOP or Gravity.END))
+        home.addView(cameraToolsButton, FrameLayout.LayoutParams(dp(56), dp(56), Gravity.TOP or Gravity.END))
+        home.addView(cameraTools, FrameLayout.LayoutParams(dp(56), -2, Gravity.TOP or Gravity.END))
         home.addView(footer, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
         home.setOnApplyWindowInsetsListener { _, insets ->
             val left: Int; val top: Int; val right: Int; val bottom: Int
@@ -264,7 +281,8 @@ class MainActivity : Activity() {
                 val safe = android.graphics.Rect(insets.systemWindowInsetLeft, insets.systemWindowInsetTop, insets.systemWindowInsetRight, insets.systemWindowInsetBottom)
                 left = safe.left; top = safe.top; right = safe.right; bottom = safe.bottom
             }
-            gear.layoutParams = (gear.layoutParams as FrameLayout.LayoutParams).apply { topMargin = top + dp(8); marginEnd = right + dp(12) }
+            cameraToolsButton.layoutParams = (cameraToolsButton.layoutParams as FrameLayout.LayoutParams).apply { topMargin = top + dp(8); marginEnd = right + dp(12) }
+            cameraTools.layoutParams = (cameraTools.layoutParams as FrameLayout.LayoutParams).apply { topMargin = top + dp(64); marginEnd = right + dp(12) }
             footer.layoutParams = (footer.layoutParams as FrameLayout.LayoutParams).apply {
                 leftMargin = left + dp(12); rightMargin = right + dp(12); bottomMargin = bottom + dp(8)
             }
@@ -946,6 +964,9 @@ class MainActivity : Activity() {
             usbSettings.visibility = if (usbMode.isChecked) View.VISIBLE else View.GONE
             pcAddressLabel.text = if (usbMode.isChecked) "PC USB adapter IPv4 · required" else "PC IPv4 · manual fallback"
             settingsNotice.text = if (active) "Streaming is active. Stop on the camera screen to change these settings." else "Changes are saved automatically. Tap Done to return to the camera."
+            if (phase3Snapshot.state == "failed") settingsNotice.append("\n${phase3Snapshot.message}")
+            else if (phase3PlanMessage.startsWith("Enter") || phase3PlanMessage.startsWith("USB not ready") || phase3PlanMessage.startsWith("No direct"))
+                settingsNotice.append("\n$phase3PlanMessage")
             resolutionHint.text = if (directModePlans.isEmpty()) "No eligible encoder mode found. Open Diagnostics to inspect or retry."
                 else if (directModePlans.first().cameraAdvertises1080p && directModePlans.none { it.width == 1920 && it.height == 1080 })
                     "1080p is camera-advertised but encoder metadata rejects it. The explicit trial is in Diagnostics."
@@ -1047,6 +1068,7 @@ class MainActivity : Activity() {
     private fun isStreamActive() = phase3Experiment != null && com.camsure.profiler.session.CameraRunPolicy.active(phase3Snapshot.state)
 
     private fun showSettings(show: Boolean) {
+        hideCameraTools()
         settingsOpen = show
         settingsPage.visibility = if (show) View.VISIBLE else View.GONE
     }
@@ -1058,7 +1080,14 @@ class MainActivity : Activity() {
     }
 
     private fun leaveSettingsOrFinish() {
-        if (settingsOpen) { saveSettings(); showSettings(false); ensurePreview() } else finish()
+        if (settingsOpen) { saveSettings(); showSettings(false); ensurePreview() }
+        else if (cameraTools.visibility == View.VISIBLE) hideCameraTools()
+        else finish()
+    }
+
+    private fun hideCameraTools() {
+        cameraTools.visibility = View.GONE
+        cameraToolsButton.contentDescription = "Show camera tools"
     }
 
     private fun saveSettings() {
@@ -1087,14 +1116,13 @@ class MainActivity : Activity() {
         homeStart.text = if (active) "Stop" else if (permissionMessage != null) "Allow Camera" else "Start"
         homeStart.isEnabled = phase3Snapshot.state != "stopping" && !previewStopping
         homeStatus.text = permissionMessage ?: when {
-            phase3Snapshot.state == "failed" -> "Connection failure: ${phase3Snapshot.message}"
-            phase3Snapshot.transport?.state == "send_error" -> "Connection failure: UDP send error. Stop, check the network and restart."
+            phase3Snapshot.state == "failed" -> "Connection failed · check Settings"
+            phase3Snapshot.transport?.state == "send_error" -> "Connection failed · stop and check Settings"
             phase3Snapshot.state == "running" && phase3Snapshot.transport == null -> "Timed camera test · preview resumes when stopped."
-            phase3Snapshot.state == "running" && phase3Snapshot.encodedFrames > 0 -> "Streaming · ${phase3Snapshot.transport?.destination ?: "timed capture"}\nSender active; check OBS for reception."
+            phase3Snapshot.state == "running" && phase3Snapshot.encodedFrames > 0 -> "Streaming · ${if (usbMode.isChecked) "USB" else "Wireless"} · check OBS"
             active -> if (phase3Snapshot.state == "stopping") "Stopping…" else "Connecting…"
             else -> "Stopped · ${if (usbMode.isChecked) "USB Network Mode" else "Wireless"}" +
-                if (phase3PlanMessage.startsWith("Enter") || phase3PlanMessage.startsWith("USB not ready") || phase3PlanMessage.startsWith("No direct")) "\nConnection failure: $phase3PlanMessage"
-                else if (phase3Snapshot.state == "stopped") "\n${phase3Snapshot.message}" else ""
+                if (phase3PlanMessage.startsWith("Enter") || phase3PlanMessage.startsWith("USB not ready") || phase3PlanMessage.startsWith("No direct")) " · check Settings" else ""
         }
     }
 

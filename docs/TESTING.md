@@ -1,5 +1,16 @@
 # TESTING.md
 
+## OBS managed receiver acceptance — 2026-10-01
+
+Build/publish and host process/libobs/decoder regressions pass; physical/frontend
+acceptance remains OPEN. Follow [OBS connection testing](OBS_CONNECTION_TESTING.md)
+for explicit adapter selection, Wireless discovery/manual fallback, USB peer/subnet,
+Start/Stop/restart, field locks, properties navigation, cable/adapter loss, saved
+settings and normal OBS close/reopen. Compare accepted 720p/1080p output with the
+old CLI workflow. Host probes do not attest physical route, firewall passage,
+frontend layout, long-running memory or end-to-end latency. Existing device results
+and 4K limitations retain their setup-specific boundaries.
+
 Transparent-controls follow-up (2026-10-01): verify camera-screen Settings and
 Start/Stop have no filled button background or footer panel, remain readable
 over bright/dark camera scenes, and retain their touch/disabled behavior.
@@ -860,3 +871,19 @@ inline errors; valid selections survive restart. While streaming, navigate to
 Settings and back, verify restart-dependent controls are disabled with an
 explanation, and confirm OBS continues smoothly. Expand Diagnostics to verify
 explicit trials, timed tests and JSON export remain accessible.
+
+Camera tools follow-up: verify no IP/setup-detail spill on main, expand/collapse/Back behavior, Settings error feedback and navigation while streaming. Physical UI/720p/1080p checks remain OPEN.
+
+Second-source startup regression: camsure-lifecycle-test --managed-pair starts two real receivers concurrently with default pipe settings and distinct media ports, asserts isolated Stop/restart, duplicate identity, save/load and cleanup. Physical retest must start both phones and confirm each has its own image; stop either and verify the other stays smooth.
+
+2026-10-01 two-source visible-drop follow-up: user supplied Xiaomi continuous LAN
+720p30 preview-inclusive837.385s report. Capture/encoder approximately30.0069fps,
+25119AUs/335621packets sent, zero reported capture/encode/sender drops or failures.
+Matching720p OBS pipe decoded22692 and submitted16227; at least6456 latest-slot
+replacements and126 recovery resets, with zero native decode errors/stale drops.
+Visible smoothness acceptance FAIL/user-observed drops; source startup success
+remains separate. Wi-Fi band UNCONFIRMED (user guesses2.4GHz). Missing receiver
+SSRC/gap/bridge counters prevent assigning all discrepancies to packet loss.
+See evidence/2026-10-01-two-camera-visible-drops-analysis.md and preserved JSON/
+CamSure-only OBS excerpt. Isolate verified5GHz single-device versus two-device
+runs before changing buffering or adding controls. No implementation change here.

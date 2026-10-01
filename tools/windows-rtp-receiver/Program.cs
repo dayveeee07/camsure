@@ -7,6 +7,15 @@ internal static class Program
 {
     private static int Main(string[] args)
     {
+        try { return Run(args); }
+        catch (Exception error) {
+            Console.Error.WriteLine("Connection failure: " + error.Message);
+            return 1;
+        }
+    }
+
+    private static int Run(string[] args)
+    {
         if (args.SequenceEqual(new[] { "--list-adapters" })) {
             foreach (var a in UsbNetworkSelection.Enumerate()) Console.WriteLine($"{a.AdapterId} | {a.AdapterName} | {a.Address}/{a.PrefixLength} (confirm USB adapter)");
             return 0;
@@ -37,9 +46,10 @@ internal static class Program
         Console.WriteLine($"Effective OS receive buffer: {socket.ReceiveBufferSize} bytes; application access-unit reassembly: 2 MiB / {(options.Usb ? 100 : 500)} ms");
         Console.WriteLine("Profile: RTP PT=96, H.264 packetization-mode=1, 90 kHz clock, RFC 8285 profile 0xBEDE");
         Console.WriteLine($"transport={(options.Usb ? "USB_NETWORK" : "LAN")}, adapter={usb?.AdapterName}, adapter-id={usb?.AdapterId}, local={socket.LocalEndPoint}, expected-peer={options.Peer}, effective-receive={socket.ReceiveBufferSize}, effective-send={socket.SendBufferSize}, epoch={DateTime.UtcNow.Ticks}");
-        using var discovery = options.Usb ? null : StartDiscoveryAdvertisement(options.Port);
+        using var discovery = options.Usb ? null : StartDiscoveryAdvertisement(options.Port, options.StopEvent is null ? null : options.BindAddress);
         Console.WriteLine(options.PipeName is null ? "Counter-only mode; use --obs-pipe camsure-camera-1 for OBS." : $"Encoded AU bridge: {options.PipeName}");
 
+        using var lifecycle = new ReceiverLifecycle(options.StopEvent, options.ReadyEvent);
         using var stop = new ManualResetEventSlim(false);
         Console.CancelKeyPress += (_, eventArgs) =>
         {
@@ -73,7 +83,8 @@ internal static class Program
         using var telemetry = new LatestTelemetryWriter();
         var receiveTiming = new ReceiveTimingStats();
 
-        while (!stop.IsSet)
+        lifecycle.Ready();
+        while (!stop.IsSet && !lifecycle.StopRequested)
         {
             try
             {
@@ -126,11 +137,11 @@ internal static class Program
         return Volatile.Read(ref linkLost) != 0 ? 3 : 0;
     }
 
-    private static DnsSdReceiverAdvertisement? StartDiscoveryAdvertisement(int mediaPort)
+    private static DnsSdReceiverAdvertisement? StartDiscoveryAdvertisement(int mediaPort, IPAddress? selectedAddress)
     {
         try
         {
-            var advertisement = DnsSdReceiverAdvertisement.Start(mediaPort);
+            var advertisement = DnsSdReceiverAdvertisement.Start(mediaPort, selectedAddress);
             Console.WriteLine($"DNS-SD: advertising '{advertisement.InstanceName}' as {DnsSdReceiverAdvertisement.ServiceType}");
             Console.WriteLine($"DNS-SD IPv4 interfaces: {advertisement.AdvertisedAddresses}; media endpoint UDP {mediaPort}; mDNS UDP 5353");
             Console.WriteLine("If discovery is blocked, allow this receiver on the Windows Private network and check that AP multicast/client isolation is disabled.");
@@ -143,7 +154,7 @@ internal static class Program
         }
     }
 
-    internal sealed record Options(IPAddress BindAddress, int Port, int DurationSeconds, string? PipeName, bool Usb = false, string? AdapterId = null, IPAddress? Peer = null, int ReceiveBufferKiB = 64)
+    internal sealed record Options(IPAddress BindAddress, int Port, int DurationSeconds, string? PipeName, bool Usb = false, string? AdapterId = null, IPAddress? Peer = null, int ReceiveBufferKiB = 64, string? StopEvent = null, string? ReadyEvent = null)
     {
         public static bool TryParse(string[] args, out Options options, out string error)
         {
@@ -155,11 +166,16 @@ internal static class Program
             string? adapterId = null;
             IPAddress? peer = null;
             int? receiveBufferKiB = null;
+            string? stopEvent = null, readyEvent = null;
             for (var index = 0; index < args.Length; index++)
             {
                 var value = index + 1 < args.Length ? args[index + 1] : null;
                 switch (args[index])
                 {
+                    case "--stop-event" when value is not null && value.StartsWith("Local\\CamSure-stop-", StringComparison.Ordinal) && value.Length <= 200:
+                        stopEvent = value; index++; break;
+                    case "--ready-event" when value is not null && value.StartsWith("Local\\CamSure-ready-", StringComparison.Ordinal) && value.Length <= 200:
+                        readyEvent = value; index++; break;
                     case "--receive-buffer-kib" when value is not null && int.TryParse(value, out var bufferKiB) && bufferKiB is >= 64 and <= 256:
                         receiveBufferKiB = bufferKiB; index++; break;
                     case "--transport" when value is "usb" or "lan": usbMode = value == "usb"; index++; break;
@@ -186,7 +202,8 @@ internal static class Program
                 }
             }
 
-            options = new Options(bind, port, duration, pipeName, usbMode, adapterId, peer, receiveBufferKiB ?? 64);
+            options = new Options(bind, port, duration, pipeName, usbMode, adapterId, peer, receiveBufferKiB ?? 64, stopEvent, readyEvent);
+            if ((stopEvent is null) != (readyEvent is null)) { error = "Managed receiver requires both lifecycle events."; return false; }
             if (!usbMode && receiveBufferKiB is not null) { error = "--receive-buffer-kib requires --transport usb (64 to 256 KiB)."; return false; }
             if (usbMode && (adapterId is null || peer is null || !UsbNetworkSelection.Usable(bind))) { error = "USB requires --adapter ID --bind LOCAL_IPV4 --peer ANDROID_IPV4; use --list-adapters."; return false; }
             if (!usbMode && (adapterId is not null || peer is not null)) { error = "--adapter/--peer require --transport usb."; return false; }

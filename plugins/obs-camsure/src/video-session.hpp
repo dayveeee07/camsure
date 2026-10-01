@@ -24,11 +24,15 @@ class VideoSession {
  std::atomic<uint64_t> submitted{0}, stale{0}, replaced{0};
  std::atomic<double> max_frame_age{0}, max_output_ms{0};
  std::atomic<bool> clear_output{false};
+ std::atomic<uint64_t> last_presented{0};
+ std::atomic<bool> failed{false};
  void run() noexcept;
 public:
  VideoSession(obs_source_t *, std::string);
  ~VideoSession();
  void present(); // OBS video tick; at most one latest frame.
+ uint64_t last_frame_time() const { return last_presented.load(); }
+ bool has_failed() const { return failed.load(); }
  VideoSession(const VideoSession &) = delete;
  VideoSession &operator=(const VideoSession &) = delete;
 };

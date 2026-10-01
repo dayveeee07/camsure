@@ -1,5 +1,32 @@
 # ARCHITECTURE.md
 
+## OBS connection ownership (2026-10-01)
+
+Each native Source may opt into ReceiverProcess alongside its existing VideoSession.
+The source stores OBS-persisted connection selections and Start/Stop intent. A
+dedicated receiver worker validates current adapter identity, launches the packaged
+Windows executable without a console/shell, consumes stdout/stderr into at most
+one 512-character diagnostic line plus one 512-character parsing fragment, and
+polls its owned process/readiness/selected-link state. Per-cycle parsing is bounded
+to 16 KiB. Video tick does not enumerate adapters or read process output.
+
+Named local ready/stop events supplement, rather than replace, CLI Ctrl+C/timers.
+The native owner restricts inherited handles to child stdin/output, starts suspended,
+assigns a kill-on-close job, then resumes. Stop requests receiver disposal of UDP,
+advertisement, AU bridge and monitor; after three seconds the job is terminated.
+Source destruction joins before release. Properties navigation/visibility leaves
+the receiver active. OBS restore retains selections but requires explicit Start.
+
+PC adapter/address/prefix is selected explicitly and revalidated without fallback.
+USB passes the same explicit adapter/bind/peer/256 KiB configuration as the accepted
+single-device trial; LAN uses selected IPv4 binding and discovery restricted to that
+endpoint. RTP reassembly, shared AU pipe, timestamps, decoder and bounded newest-frame
+handoff are reused. Recent OBS-submitted video supports Streaming status; a two-second
+absence shows no recent video and preserves the existing keyframe recovery path.
+Full pipe failure or selected-adapter loss stops the managed owner. Settings that
+need restart stay disabled until cleanup. Native host tests are distinct from
+physical frontend/phone acceptance; see OBS_CONNECTION_TESTING.md and D-024.
+
 ## System Overview
 
 2026-10-01 experimental extension: shared H.264 decode accepts even-sized
@@ -538,3 +565,7 @@ stream, SSRC/generation/configuration/IDR. No second media pipeline, privileged
 tether activation, ADB/debugging or native USB protocol is introduced. Actual
 limits, ownership, telemetry and polling/OEM limitations are in
 [completion report](USB_NETWORK_REPORT.md).
+
+Camera overlay follow-up (2026-10-01): the main tools icon toggles an attached transparent Settings shortcut. Back collapses tools before exiting. Endpoints and setup-error details live in Settings; the overlay does not create, stop or replace a camera/transport owner. Future zoom/torch/switch controls can extend this tools container.
+
+Managed-source pipe correction (2026-10-01): inherited pipe defaults are replaced on Start with a persisted camsure-auto-<OBS source UUID> identity. Automatic duplicates derive a new UUID pipe; restored sources retain theirs. Explicit custom pipes/external receiver defaults stay compatible. Distinct media ports remain required.

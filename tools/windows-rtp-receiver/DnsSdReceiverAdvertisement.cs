@@ -16,19 +16,26 @@ internal sealed class DnsSdReceiverAdvertisement : IDisposable
     private readonly string _instanceFqdn;
     private readonly string _hostFqdn;
     private readonly int _mediaPort;
+    private readonly IPAddress? _boundAddress;
     private readonly Thread _worker;
     private List<IPAddress> _interfaceAddresses;
     private volatile bool _stopping;
 
-    private DnsSdReceiverAdvertisement(Socket socket, int mediaPort, List<IPAddress> addresses)
+    private DnsSdReceiverAdvertisement(Socket socket, int mediaPort, List<IPAddress> addresses, IPAddress? boundAddress)
     {
         _socket = socket;
         _mediaPort = mediaPort;
+        _boundAddress = boundAddress;
         _interfaceAddresses = addresses;
         var machineName = SanitizeHostLabel(Environment.MachineName);
         _instanceName = "CamSure Receiver " + Environment.MachineName;
         _instanceFqdn = _instanceName + "." + ServiceType;
         _hostFqdn = machineName + ".local.";
+        if (boundAddress is not null) {
+            _instanceName += " " + mediaPort;
+            _instanceFqdn = _instanceName + "." + ServiceType;
+            _hostFqdn = SanitizeHostLabel(machineName + "-camsure-" + mediaPort) + ".local.";
+        }
         _worker = new Thread(WorkerLoop)
         {
             IsBackground = true,
@@ -37,9 +44,10 @@ internal sealed class DnsSdReceiverAdvertisement : IDisposable
         _worker.Start();
     }
 
-    public static DnsSdReceiverAdvertisement Start(int mediaPort)
+    public static DnsSdReceiverAdvertisement Start(int mediaPort, IPAddress? boundAddress = null)
     {
         var addresses = GetLocalIpv4Addresses();
+        if (boundAddress is not null) addresses = addresses.Where(a => a.Equals(boundAddress)).ToList();
         if (addresses.Count == 0)
             throw new InvalidOperationException("No active local IPv4 interface is available for DNS-SD advertisement.");
 
@@ -76,7 +84,7 @@ internal sealed class DnsSdReceiverAdvertisement : IDisposable
             throw new InvalidOperationException("Could not join the mDNS multicast group on an active IPv4 interface.");
         }
 
-        return new DnsSdReceiverAdvertisement(socket, mediaPort, joined);
+        return new DnsSdReceiverAdvertisement(socket, mediaPort, joined, boundAddress);
     }
 
     public string InstanceName => _instanceName;
@@ -143,6 +151,7 @@ internal sealed class DnsSdReceiverAdvertisement : IDisposable
     private void RefreshInterfaces()
     {
         var refreshed = GetLocalIpv4Addresses();
+        if (_boundAddress is not null) refreshed = refreshed.Where(a => a.Equals(_boundAddress)).ToList();
         var removed = _interfaceAddresses.Except(refreshed).ToList();
         var added = refreshed.Except(_interfaceAddresses).ToList();
         if (removed.Count == 0 && added.Count == 0) return;

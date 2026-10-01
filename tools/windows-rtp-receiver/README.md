@@ -1,5 +1,11 @@
 # CamSure fixed-endpoint RTP/H.264 receiver
 
+2026-10-01: the same receiver can now be launched/owned by the native CamSure OBS
+source without a console. Optional paired `--stop-event` / `--ready-event` provide
+local lifecycle signaling; existing CLI flags, Ctrl+C and timed runs remain.
+Managed LAN discovery is limited to its selected bind address. Managed USB keeps
+explicit adapter/bind/peer validation. See ../../docs/OBS_CONNECTION_TESTING.md.
+
 This is a Windows receiver for the Phase 4 LAN prototype. By default it only
 reports counters. It binds
 to an IPv4 UDP port, validates CamSure RTP packets, reassembles H.264 access

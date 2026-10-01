@@ -14,3 +14,4 @@ local.properties
 # Standalone Windows RTP receiver build output
 tools/windows-rtp-receiver/bin/
 tools/windows-rtp-receiver/obj/
+plugins/obs-camsure/data/receiver/

@@ -89,7 +89,135 @@ int main(int argc, char **argv)
 		require(obs_reset_video(&video) == OBS_VIDEO_SUCCESS, "D3D11 video initialization failed");
 		obs_module_t *module = nullptr;
 		require(obs_open_module(&module, argv[1], argv[2]) == MODULE_SUCCESS, "Plugin load failed");
-		require(obs_init_module(module), "Plugin initialization failed");
+        require(obs_init_module(module), "Plugin initialization failed");
+        if (argc == 4 && std::string(argv[3]) == "--managed-pair") {
+            auto state = [](obs_source_t *source) {
+                auto *props = obs_source_properties(source);
+                const std::string result = obs_property_description(obs_properties_get(props, "receiver_status"));
+                obs_properties_destroy(props); return result;
+            };
+            auto wait_state = [&](obs_source_t *source, const char *expected) {
+                for (unsigned i = 0; i < 150; ++i) {
+                    if (state(source).find(expected) != std::string::npos) return;
+                    os_sleep_ms(50);
+                }
+                throw std::runtime_error("Pair source state timeout: " + state(source));
+            };
+            auto click = [](obs_source_t *source, const char *button) {
+                auto *props = obs_source_properties(source);
+                obs_property_button_clicked(obs_properties_get(props, button), source);
+                obs_properties_destroy(props);
+            };
+            std::string adapter;
+            for (unsigned i = 0; i < 2; ++i) {
+                auto *settings = obs_data_create();
+                obs_data_set_bool(settings, "managed_receiver", true);
+                obs_data_set_int(settings, "media_port", 5021 + i);
+                if (i) obs_data_set_string(settings, "pc_adapter", adapter.c_str());
+                sources[i] = obs_source_create("camsure_camera", i ? "Receiver B" : "Receiver A", settings, nullptr);
+                obs_data_release(settings); require(sources[i] != nullptr, "Pair source creation");
+                if (!i) {
+                    auto *props = obs_source_properties(sources[0]);
+                    auto *list = obs_properties_get(props, "pc_adapter");
+                    require(obs_property_list_item_count(list) > 1, "Pair adapter inventory");
+                    adapter = obs_property_list_item_string(list, 1); obs_properties_destroy(props);
+                    settings = obs_source_get_settings(sources[0]);
+                    obs_data_set_string(settings, "pc_adapter", adapter.c_str());
+                    obs_source_update(sources[0], settings); obs_data_release(settings);
+                }
+                os_sleep_ms(150); click(sources[i], "start_receiver"); wait_state(sources[i], "Waiting for phone");
+            }
+            auto pipe_name = [](obs_source_t *source) {
+                auto *settings = obs_source_get_settings(source);
+                std::string pipe = obs_data_get_string(settings, "au_pipe"); obs_data_release(settings); return pipe;
+            };
+            const auto first_pipe = pipe_name(sources[0]), second_pipe = pipe_name(sources[1]);
+            require(first_pipe != second_pipe && first_pipe.rfind("camsure-auto-", 0) == 0, "Managed defaults must use separate saved pipes");
+            click(sources[1], "stop_receiver"); wait_state(sources[1], "Stopped");
+            require(state(sources[0]).find("Waiting for phone") != std::string::npos, "Stopping B must preserve A");
+            click(sources[1], "start_receiver"); wait_state(sources[1], "Waiting for phone");
+            require(pipe_name(sources[1]) == second_pipe, "B restart must retain its pipe identity");
+            duplicate = obs_source_duplicate(sources[0], "Receiver duplicate", false);
+            require(duplicate != nullptr, "Duplicate managed source");
+            auto *settings = obs_source_get_settings(duplicate);
+            obs_data_set_int(settings, "media_port", 5023); obs_source_update(duplicate, settings); obs_data_release(settings);
+            os_sleep_ms(150); click(duplicate, "start_receiver"); wait_state(duplicate, "Waiting for phone");
+            require(pipe_name(duplicate) != first_pipe && pipe_name(duplicate) != second_pipe, "Duplicate must get its own automatic pipe");
+            obs_source_release(duplicate); duplicate = nullptr; drain_destruction();
+            click(sources[0], "stop_receiver"); wait_state(sources[0], "Stopped");
+            require(state(sources[1]).find("Waiting for phone") != std::string::npos, "Stopping A must preserve B");
+            auto *saved = obs_save_source(sources[0]);
+            obs_source_release(sources[0]); sources[0] = nullptr; drain_destruction();
+            sources[0] = obs_load_source(saved); obs_data_release(saved);
+            os_sleep_ms(150); click(sources[0], "start_receiver"); wait_state(sources[0], "Waiting for phone");
+            require(pipe_name(sources[0]) == first_pipe, "Save/load must retain automatic pipe identity");
+            for (unsigned i = 0; i < 2; ++i) { obs_source_release(sources[i]); sources[i] = nullptr; }
+            drain_destruction();
+            std::puts("PASS: concurrent managed receivers, automatic unique pipes, independent Stop/restart, duplicate isolation, saved identity and cleanup. Host-only; no two-phone video claim.");
+            obs_shutdown(); return 0;
+        }
+        if (argc == 4 && std::string(argv[3]) == "--managed") {
+            auto *settings = obs_data_create();
+            obs_data_set_bool(settings, "managed_receiver", true);
+            obs_data_set_string(settings, "au_pipe", "camsure-source-owner-test");
+            obs_data_set_int(settings, "media_port", 5019);
+            sources[0] = obs_source_create("camsure_camera", "Managed source probe", settings, nullptr);
+            obs_data_release(settings);
+            require(sources[0] != nullptr, "Managed source creation");
+            auto *props = obs_source_properties(sources[0]);
+            auto *adapters = obs_properties_get(props, "pc_adapter");
+            require(obs_property_list_item_count(adapters) > 1, "Managed adapter inventory");
+            const std::string key = obs_property_list_item_string(adapters, 1);
+            settings = obs_source_get_settings(sources[0]);
+            obs_data_set_string(settings, "pc_adapter", key.c_str());
+            obs_source_update(sources[0], settings); obs_data_release(settings);
+            obs_properties_destroy(props); os_sleep_ms(150);
+            auto state = [&] {
+                auto *p = obs_source_properties(sources[0]);
+                const std::string text = obs_property_description(obs_properties_get(p, "receiver_status"));
+                obs_properties_destroy(p); return text;
+            };
+            auto wait_state = [&](const char *expected) {
+                for (unsigned i = 0; i < 150; ++i) {
+                    if (state().find(expected) != std::string::npos) return;
+                    os_sleep_ms(50);
+                }
+                throw std::runtime_error("Managed source state timeout: " + state());
+            };
+            for (unsigned cycle = 0; cycle < 3; ++cycle) {
+                props = obs_source_properties(sources[0]);
+                obs_property_button_clicked(obs_properties_get(props, "start_receiver"), sources[0]);
+                obs_properties_destroy(props); wait_state("Waiting for phone");
+                props = obs_source_properties(sources[0]);
+                require(!obs_property_enabled(obs_properties_get(props, "pc_adapter")), "Connection changes locked while running");
+                obs_property_button_clicked(obs_properties_get(props, "stop_receiver"), sources[0]);
+                obs_properties_destroy(props); wait_state("Stopped");
+                props = obs_source_properties(sources[0]);
+                require(obs_property_enabled(obs_properties_get(props, "pc_adapter")), "Connection changes unlocked after Stop");
+                obs_properties_destroy(props);
+            }
+            settings = obs_source_get_settings(sources[0]);
+            obs_data_set_string(settings, "connection_mode", "usb");
+            props = obs_source_properties(sources[0]); obs_properties_apply_settings(props, settings);
+            require(obs_property_visible(obs_properties_get(props, "phone_ipv4")), "USB shows expected peer field");
+            obs_data_set_string(settings, "connection_mode", "lan"); obs_properties_apply_settings(props, settings);
+            require(!obs_property_visible(obs_properties_get(props, "phone_ipv4")), "LAN hides USB peer field");
+            obs_properties_destroy(props);
+            require(std::string(obs_data_get_string(settings, "pc_adapter")) == key, "Exact adapter identity persists in OBS settings");
+            auto *saved_source = obs_save_source(sources[0]);
+            obs_source_release(sources[0]); sources[0] = nullptr; drain_destruction();
+            sources[0] = obs_load_source(saved_source); obs_data_release(saved_source);
+            obs_data_release(settings); os_sleep_ms(150); wait_state("Stopped");
+            settings = obs_source_get_settings(sources[0]);
+            require(std::string(obs_data_get_string(settings, "pc_adapter")) == key, "Adapter setting survives source save/load");
+            obs_data_release(settings);
+            props = obs_source_properties(sources[0]);
+            obs_property_button_clicked(obs_properties_get(props, "start_receiver"), sources[0]);
+            obs_properties_destroy(props); wait_state("Waiting for phone");
+            obs_source_release(sources[0]); sources[0] = nullptr; drain_destruction();
+            std::puts("PASS: managed OBS source adapter inventory, three Start/Stop cycles, field locks, USB/LAN visibility, saved settings, explicit restart after load and removal cleanup.");
+            obs_shutdown(); return 0;
+        }
         if (argc == 4 && (std::string(argv[3]) == "--video" || std::string(argv[3]) == "--video-4k")) {
             const bool uhd = std::string(argv[3]) == "--video-4k";
             auto *settings = obs_data_create();
